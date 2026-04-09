@@ -1,0 +1,93 @@
+services:
+
+  # ── Banco de dados principal ──────────────────────────────
+  postgres:
+    image: postgres:15
+    container_name: smartphones_postgres
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Fila de mensagens ─────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: smartphones_redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Coletor: busca dados na API e publica no Redis ────────
+  collector:
+    build: ./collector
+    container_name: smartphones_collector
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  # ── Consumer: lê o Redis e persiste no PostgreSQL ─────────
+  consumer:
+    build: ./consumer
+    container_name: smartphones_consumer
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  # ── Orquestrador: agenda e monitora o pipeline ────────────
+  prefect-server:
+    image: prefecthq/prefect:2-latest
+    container_name: smartphones_prefect
+    command: prefect server start --host 0.0.0.0
+    ports:
+      - "4200:4200"
+    environment:
+      PREFECT_API_DATABASE_CONNECTION_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4200/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  # ── Dashboard: visualizações Streamlit ───────────────────
+  dashboard:
+    build: ./dashboard
+    container_name: smartphones_dashboard
+    env_file: .env
+    ports:
+      - "${STREAMLIT_PORT}:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  postgres_data:
+  redis_data:

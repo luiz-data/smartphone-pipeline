@@ -1,0 +1,23 @@
+# Variáveis de ambiente — NUNCA commitar
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/.user.yml
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Docker
+*.log
