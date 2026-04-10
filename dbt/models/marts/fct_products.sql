@@ -57,7 +57,7 @@ enriched as (
         discount_pct,
         currency,
 
-        -- Faixa de preço (P2): categoriza o produto por valor
+        -- Faixa de preço ampla — usada em comparações por segmento
         case
             when price < 1000              then 'Até R$1.000'
             when price < 2000              then 'R$1.000 – R$2.000'
@@ -65,6 +65,10 @@ enriched as (
             when price < 5000              then 'R$3.500 – R$5.000'
             else                                'Acima de R$5.000'
         end                                         as price_bucket,
+
+        -- Faixa de preço em R$500 (P9): alimenta agg_price_histogram
+        (floor(price / 500) * 500)::integer         as price_bucket_500_start,
+        (floor(price / 500) * 500 + 499)::integer   as price_bucket_500_end,
 
         -- Score de custo-benefício (P10): normaliza rating pelo preço
         -- Quanto maior o score, melhor a relação avaliação/custo.
