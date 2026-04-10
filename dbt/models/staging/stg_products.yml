@@ -1,0 +1,118 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: >
+      Produtos Amazon BR limpos e tipados. Um registro por produto por coleta
+      (product_id + collected_at). Deduplica duplicatas da origem, extrai marca
+      do título, recalcula desconto e padroniza todos os tipos.
+
+    tests:
+      # Unicidade composta: mesmo produto pode aparecer em coletas diferentes,
+      # mas nunca duas vezes na mesma coleta.
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - product_id
+            - collected_at
+
+    columns:
+      - name: ingestion_id
+        description: "UUID único por evento de extração."
+        tests:
+          - not_null
+          - unique
+
+      - name: batch_id
+        description: "Identificador da rodada de coleta."
+        tests:
+          - not_null
+
+      - name: source
+        description: "Fonte dos dados — sempre 'amazon_br'."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['amazon_br']
+
+      - name: collected_at
+        description: "Timestamp UTC da coleta."
+        tests:
+          - not_null
+
+      - name: inserted_at
+        description: "Timestamp UTC de inserção no PostgreSQL."
+        tests:
+          - not_null
+
+      - name: product_id
+        description: "ASIN do produto na Amazon."
+        tests:
+          - not_null
+
+      - name: title
+        description: "Título completo do produto."
+        tests:
+          - not_null
+
+      - name: brand
+        description: "Marca extraída via heurística do título. Nulo quando não identificada."
+
+      - name: condition
+        description: "Condição do produto: 'new' ou 'used'."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['new', 'used']
+
+      - name: url
+        description: "URL canônica do produto na Amazon."
+
+      - name: thumbnail_url
+        description: "URL da imagem principal."
+
+      - name: price
+        description: "Preço atual em BRL."
+        tests:
+          - not_null
+
+      - name: original_price
+        description: "Preço original antes do desconto, em BRL."
+
+      - name: discount_pct
+        description: "Percentual de desconto (0 a 100). Zero quando não há desconto."
+
+      - name: currency
+        description: "Código de moeda — sempre 'BRL'."
+
+      - name: rating
+        description: "Avaliação média (0.0 a 5.0)."
+
+      - name: num_ratings
+        description: "Número total de avaliações. Zero quando não informado."
+
+      - name: is_best_seller
+        description: "True se o produto tem badge Best Seller."
+
+      - name: is_amazon_choice
+        description: "True se o produto tem badge Amazon Choice."
+
+      - name: is_prime
+        description: "True se elegível para entrega Prime."
+
+      - name: free_shipping
+        description: "True se o produto tem frete grátis."
+
+      - name: delivery_text
+        description: "Texto completo da informação de entrega."
+
+      - name: sales_volume
+        description: "Texto de volume de vendas (ex.: 'Mais de 1 mil compras no mês passado')."
+
+      - name: num_offers
+        description: "Número de ofertas de terceiros."
+
+      - name: raw_payload
+        description: "Payload JSON bruto da API para auditoria e reprocessamento."
+
+      - name: seed_flag
+        description: "False para dados reais; True para registros do seed histórico."

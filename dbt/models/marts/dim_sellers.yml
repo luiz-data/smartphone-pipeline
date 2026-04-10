@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: dim_sellers
+    description: >
+      Dimensão de marcas/fabricantes. Agrega métricas de preço, desconto,
+      avaliação e logística por marca. Usa brand como proxy de "vendedor"
+      pois a API de busca Amazon BR não retorna dados de seller individual.
+      Une dados reais e seed histórico para disponibilidade imediata.
+
+    columns:
+      - name: brand
+        description: "Marca identificada (ou 'Sem marca identificada')."
+        tests: [not_null, unique]
+
+      - name: total_products
+        description: "Número de ASINs distintos observados para esta marca."
+
+      - name: total_observations
+        description: "Total de linhas (produto × coleta) — inclui histórico."
+
+      - name: avg_price
+        description: "Preço médio em BRL considerando todas as coletas."
+
+      - name: min_price
+        description: "Menor preço observado para qualquer produto da marca."
+
+      - name: max_price
+        description: "Maior preço observado."
+
+      - name: stddev_price
+        description: "Desvio padrão do preço — mede dispersão dentro da marca."
+
+      - name: avg_discount_pct
+        description: "Desconto médio praticado pela marca."
+
+      - name: max_discount_pct
+        description: "Maior desconto já observado para a marca."
+
+      - name: avg_rating
+        description: "Avaliação média ponderada."
+
+      - name: total_reviews
+        description: "Soma total de avaliações de todos os produtos da marca."
+
+      - name: max_rating
+        description: "Maior rating individual observado."
+
+      - name: total_free_shipping
+        description: "Número de observações com frete grátis."
+
+      - name: total_prime
+        description: "Número de observações com elegibilidade Prime."
+
+      - name: total_best_sellers
+        description: "Produtos com badge Best Seller."
+
+      - name: total_amazon_choice
+        description: "Produtos com badge Amazon Choice."
+
+      - name: pct_free_shipping
+        description: "Percentual de observações com frete grátis (0 a 100)."
+
+      - name: first_seen_at
+        description: "Primeira coleta registrada para esta marca."
+
+      - name: last_seen_at
+        description: "Coleta mais recente registrada para esta marca."

@@ -1,0 +1,108 @@
+version: 2
+
+models:
+  - name: fct_products
+    description: >
+      Tabela fato principal. Um registro por produto por coleta (product_id + collected_at).
+      Alimentada incrementalmente com dados reais (seed_flag = false).
+      Inclui campos analíticos calculados como price_bucket e value_score.
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - product_id
+            - collected_at
+
+    columns:
+      - name: ingestion_id
+        description: "UUID único por evento de extração."
+        tests: [not_null]
+
+      - name: batch_id
+        description: "Identificador da rodada de coleta."
+        tests: [not_null]
+
+      - name: source
+        description: "Sempre 'amazon_br'."
+
+      - name: collected_at
+        description: "Timestamp UTC da coleta."
+        tests: [not_null]
+
+      - name: collection_date
+        description: "Data da coleta (truncada em dia) — usada para agrupamentos temporais."
+
+      - name: inserted_at
+        description: "Timestamp UTC de inserção no PostgreSQL."
+
+      - name: product_id
+        description: "ASIN do produto."
+        tests: [not_null]
+
+      - name: title
+        description: "Título do produto."
+
+      - name: brand
+        description: "Marca extraída do título ou fornecida diretamente."
+
+      - name: condition
+        description: "'new' ou 'used'."
+
+      - name: url
+        description: "URL do produto na Amazon."
+
+      - name: thumbnail_url
+        description: "URL da imagem."
+
+      - name: price
+        description: "Preço atual em BRL."
+        tests: [not_null]
+
+      - name: original_price
+        description: "Preço original antes do desconto."
+
+      - name: discount_pct
+        description: "Percentual de desconto."
+
+      - name: currency
+        description: "Moeda — 'BRL'."
+
+      - name: price_bucket
+        description: >
+          Faixa de preço categorizada: 'Até R$1.000', 'R$1.000 – R$2.000',
+          'R$2.000 – R$3.500', 'R$3.500 – R$5.000', 'Acima de R$5.000'.
+
+      - name: value_score
+        description: >
+          Score de custo-benefício: rating × num_ratings / price.
+          Quanto maior, melhor a relação qualidade/preço.
+
+      - name: rating
+        description: "Avaliação média (0.0 a 5.0)."
+
+      - name: num_ratings
+        description: "Total de avaliações."
+
+      - name: is_best_seller
+        description: "Badge Best Seller."
+
+      - name: is_amazon_choice
+        description: "Badge Amazon Choice."
+
+      - name: is_prime
+        description: "Elegibilidade Prime."
+
+      - name: free_shipping
+        description: "Frete grátis."
+
+      - name: delivery_text
+        description: "Texto de entrega."
+
+      - name: sales_volume
+        description: "Texto de volume de vendas."
+
+      - name: num_offers
+        description: "Número de ofertas de terceiros."
+
+      - name: seed_flag
+        description: "Sempre false — fct_products contém apenas dados reais."

@@ -1,0 +1,22 @@
+# profiles.yml — conexão com PostgreSQL via variáveis de ambiente.
+#
+# Para rodar fora do Docker:
+#   export POSTGRES_HOST=localhost POSTGRES_PASSWORD=... e então: dbt run --profiles-dir .
+#
+# No Docker Compose, as variáveis já chegam via env_file: .env no serviço dbt.
+# O comando do container deve incluir --profiles-dir /app/dbt ou setar
+# a variável DBT_PROFILES_DIR=/app/dbt.
+
+smartphones:
+  target: dev
+  outputs:
+    dev:
+      type:     postgres
+      host:     "{{ env_var('POSTGRES_HOST', 'localhost') }}"
+      port:     "{{ env_var('POSTGRES_PORT', '5432') | int }}"
+      dbname:   "{{ env_var('POSTGRES_DB', 'smartphones') }}"
+      user:     "{{ env_var('POSTGRES_USER', 'pipeline_user') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      schema:   staging   # schema padrão de conexão; os modelos usam +schema explícito
+      threads:  4
+      keepalives_idle: 0

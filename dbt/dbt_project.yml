@@ -1,0 +1,52 @@
+name: 'smartphones'
+version: '1.0.0'
+config-version: 2
+
+profile: 'smartphones'
+
+model-paths:    ["models"]
+seed-paths:     ["seeds"]
+test-paths:     ["tests"]
+macro-paths:    ["macros"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# ── Configurações por camada ──────────────────────────────────────────────────
+models:
+  smartphones:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+      fct_products:
+        +materialized: incremental
+        +incremental_strategy: merge
+        +unique_key:
+          - product_id
+          - collected_at
+
+# ── Seeds ─────────────────────────────────────────────────────────────────────
+# Seeds vão para o schema staging para serem acessíveis pelos modelos marts
+seeds:
+  smartphones:
+    +schema: staging
+    historical_prices:
+      +column_types:
+        price:          numeric
+        original_price: numeric
+        discount_pct:   numeric
+        rating:         numeric
+        num_ratings:    integer
+        num_offers:     integer
+        is_best_seller:   boolean
+        is_amazon_choice: boolean
+        is_prime:         boolean
+        free_shipping:    boolean
+        seed_flag:        boolean

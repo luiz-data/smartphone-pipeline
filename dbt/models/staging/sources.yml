@@ -1,0 +1,66 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Schema de landing zone. Dados brutos inseridos pelo consumer após leitura do Redis Stream."
+    database: "{{ env_var('POSTGRES_DB', 'smartphones') }}"
+    schema: raw
+    tables:
+      - name: products
+        description: >
+          Tabela de entrada com produtos coletados da Amazon BR via RapidAPI.
+          Inserida pelo consumer com garantia de idempotência (unique product_id + collected_at).
+          Cada linha representa um produto observado em um momento específico de coleta.
+        columns:
+          - name: id
+            description: "PK serial gerada pelo PostgreSQL."
+          - name: ingestion_id
+            description: "UUID único por evento de extração (gerado no collector)."
+          - name: batch_id
+            description: "Identificador da rodada de coleta (ex.: batch-2026-04-10-21h)."
+          - name: source
+            description: "Sempre 'amazon_br' para dados provenientes da Amazon Brasil."
+          - name: collected_at
+            description: "Timestamp UTC de quando o produto foi extraído da API."
+          - name: inserted_at
+            description: "Timestamp UTC de quando a linha foi gravada no PostgreSQL."
+          - name: product_id
+            description: "ASIN do produto na Amazon (ex.: B0FR5GNJDB)."
+          - name: title
+            description: "Título completo do produto conforme exibido na Amazon."
+          - name: brand
+            description: "Marca do produto. NULL para dados da busca (disponível no endpoint /product-details)."
+          - name: condition
+            description: "Condição do produto: 'new' para buscas padrão na Amazon BR."
+          - name: url
+            description: "URL canônica do produto na Amazon."
+          - name: thumbnail_url
+            description: "URL da imagem principal do produto."
+          - name: price
+            description: "Preço atual em BRL (já convertido de string para numeric pelo collector)."
+          - name: original_price
+            description: "Preço original antes do desconto, em BRL."
+          - name: discount_pct
+            description: "Percentual de desconto calculado: (original_price - price) / original_price * 100."
+          - name: currency
+            description: "Moeda do preço — sempre 'BRL' para Amazon BR."
+          - name: rating
+            description: "Avaliação média do produto (0.0 a 5.0)."
+          - name: num_ratings
+            description: "Número total de avaliações do produto."
+          - name: is_best_seller
+            description: "True se o produto é best seller na categoria."
+          - name: is_amazon_choice
+            description: "True se o produto tem badge Amazon Choice."
+          - name: is_prime
+            description: "True se o produto é elegível para entrega Prime."
+          - name: free_shipping
+            description: "True se o produto tem frete grátis (inferido do campo delivery_text)."
+          - name: delivery_text
+            description: "Texto completo da informação de entrega exibida na Amazon."
+          - name: sales_volume
+            description: "Texto de volume de vendas (ex.: 'Mais de 1 mil compras no mês passado')."
+          - name: num_offers
+            description: "Número de ofertas de terceiros para o mesmo produto."
+          - name: raw_payload
+            description: "Payload JSON bruto retornado pela RapidAPI — disponível para reprocessamento e auditoria."
