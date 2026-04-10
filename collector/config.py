@@ -17,12 +17,13 @@ REDIS_PORT          = int(os.environ["REDIS_PORT"])
 REDIS_STREAM        = os.environ["REDIS_STREAM"]
 REDIS_FAILED_STREAM = os.environ["REDIS_FAILED_STREAM"]
 
-# === Mercado Livre API ===
-ML_API_BASE_URL = os.environ["ML_API_BASE_URL"]
-ML_SITE_ID      = os.environ["ML_SITE_ID"]
-ML_CATEGORY_ID  = os.environ["ML_CATEGORY_ID"]
-ML_SEARCH_LIMIT = int(os.environ["ML_SEARCH_LIMIT"])
-ML_MAX_PAGES    = int(os.environ["ML_MAX_PAGES"])
+# === Amazon BR via RapidAPI ===
+RAPIDAPI_KEY        = os.environ["RAPIDAPI_KEY"]
+RAPIDAPI_HOST       = os.environ["RAPIDAPI_HOST"]
+AMAZON_DOMAIN       = os.environ["AMAZON_DOMAIN"]
+AMAZON_SEARCH_QUERY = os.environ["AMAZON_SEARCH_QUERY"]
+AMAZON_MAX_PAGES    = int(os.environ["AMAZON_MAX_PAGES"])
+AMAZON_PAGE_SIZE    = int(os.environ["AMAZON_PAGE_SIZE"])
 
 # === Collector ===
 COLLECTOR_BATCH_SIZE          = int(os.environ["COLLECTOR_BATCH_SIZE"])

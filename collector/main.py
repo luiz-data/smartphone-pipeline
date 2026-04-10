@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import config
 from logger import get_logger
-from mercadolivre import collect_all
+from amazon import collect_all
 from publisher import publish
 
 logger = get_logger("main")
