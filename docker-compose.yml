@@ -34,12 +34,36 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── Coletor: busca dados na API e publica no Redis ────────
+  # ── Coletor: execução avulsa fora da orquestração ────────
+  # Em produção o collector é invocado pelo serviço orchestration como subprocess.
+  # Mantenha este serviço para testes manuais isolados: docker-compose run collector
   collector:
     build: ./collector
     container_name: smartphones_collector
     env_file: .env
     depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"   # não reinicia automaticamente; controlado pela orquestração
+
+  # ── Orquestrador: agenda e executa o pipeline completo ───
+  # Build context = raiz do projeto para acessar collector/ e dbt/.
+  orchestration:
+    build:
+      context: .
+      dockerfile: orchestration/Dockerfile
+    container_name: smartphones_orchestration
+    env_file: .env
+    environment:
+      PREFECT_API_URL:   http://prefect-server:4200/api
+      DBT_PROJECT_DIR:   /app/dbt
+      DBT_PROFILES_DIR:  /app/dbt
+      COLLECTOR_DIR:     /app/collector
+    depends_on:
+      prefect-server:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
