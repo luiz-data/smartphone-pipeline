@@ -45,6 +45,27 @@ def _parse_price(raw: Optional[str]) -> Optional[float]:
         return None
 
 
+def _parse_sales_volume(text: str) -> int:
+    """
+    Converte texto de volume de vendas em número inteiro.
+    Exemplos:
+        "Mais de 2 mil compras no mês passado" → 2000
+        "Mais de 500 compras no mês passado"   → 500
+        ""                                      → 0
+    """
+    if not text:
+        return 0
+    # Tenta "N mil" primeiro (ex.: "2 mil")
+    match = re.search(r"(\d+)\s*mil", text, re.IGNORECASE)
+    if match:
+        return int(match.group(1)) * 1000
+    # Tenta número simples (ex.: "500")
+    match = re.search(r"(\d+)", text)
+    if match:
+        return int(match.group(1))
+    return 0
+
+
 class RateLimitError(Exception):
     """Erro 429 — API temporariamente indisponível."""
     pass

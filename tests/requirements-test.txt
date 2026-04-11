@@ -1,0 +1,15 @@
+# Dependências de teste — instalar dentro do .venv do projeto
+# .venv/bin/pip install -r tests/requirements-test.txt
+
+# Runner e plugins
+pytest==7.4.0
+pytest-postgresql==7.0.2
+
+# Driver PostgreSQL (necessário para testes de integração)
+psycopg2-binary==2.9.9
+
+# Dependências do collector (necessárias para importar amazon.py nos testes)
+httpx==0.27.0
+tenacity==8.2.3
+redis==5.0.4
+python-dotenv==1.0.1
