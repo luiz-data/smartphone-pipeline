@@ -14,10 +14,15 @@ import streamlit as st
 
 from utils import (
     AMBER,
+    AXIS_STYLE,
     BLUE,
+    BORDER,
+    BG_CARD,
     BRAND_COLORS,
+    GRAPH_LAYOUT,
     GREEN,
     PLOTLY_TEMPLATE,
+    PURPLE,
     RED,
     TEXT_PRI,
     TEXT_SEC,
@@ -39,9 +44,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.markdown('<style>.block-container{padding-top:1.5rem}</style>', unsafe_allow_html=True)
-
-# ── Sidebar ────────────────────────────────────────────────────────────────
+# ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters = build_sidebar()
 where_fct = build_where(filters)
 
@@ -49,7 +52,7 @@ where_fct = build_where(filters)
 # ══════════════════════════════════════════════════════════════════════════
 # P5 — Série temporal de preços
 # ══════════════════════════════════════════════════════════════════════════
-section_header("📈 Evolução de Preços no Tempo", "Preço médio diário com banda de confiança P25–P75 (P5)")
+section_header("📈 Evolução de Preços no Tempo", "Preço médio diário com banda de confiança P25–P75 (P5)", BLUE)
 
 sql_p5 = f"""
     SELECT
@@ -80,7 +83,8 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
             <div style="
                 background:{AMBER}18;border-left:4px solid {AMBER};
                 padding:10px 14px;border-radius:0 8px 8px 0;
-                font-size:.85rem;color:{TEXT_PRI};margin-bottom:12px
+                font-size:.85rem;color:{TEXT_PRI};margin-bottom:12px;
+                box-shadow:0 2px 8px rgba(0,0,0,0.2);
             ">
                 ⚠️ <strong>Dados históricos sintéticos:</strong> Alguns dias exibidos contêm apenas
                 dados de seed (histórico simulado para fins de demonstração do pipeline).
@@ -97,7 +101,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         x=list(df_p5["collection_date"]) + list(df_p5["collection_date"])[::-1],
         y=list(df_p5["p75_price"]) + list(df_p5["p25_price"])[::-1],
         fill="toself",
-        fillcolor="rgba(37, 99, 235, 0.13)",
+        fillcolor="rgba(79, 142, 247, 0.15)",
         line=dict(color="rgba(0,0,0,0)"),
         name="P25–P75",
         hoverinfo="skip",
@@ -110,7 +114,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         mode="lines",
         line=dict(color=GREEN, dash="dot", width=1),
         name="Mínimo",
-        opacity=0.6,
+        opacity=0.7,
     ))
 
     # Linha de preço máximo
@@ -120,7 +124,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         mode="lines",
         line=dict(color=RED, dash="dot", width=1),
         name="Máximo",
-        opacity=0.6,
+        opacity=0.7,
     ))
 
     # Linha principal (preço médio)
@@ -153,11 +157,12 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         x=df_p5["collection_date"],
         y=df_p5["median_price"],
         mode="lines",
-        line=dict(color="#7C3AED", dash="dash", width=1.5),
+        line=dict(color=PURPLE, dash="dash", width=1.5),
         name="Mediana",
     ))
 
     fig_p5.update_layout(
+        **GRAPH_LAYOUT,
         template=PLOTLY_TEMPLATE,
         yaxis_title="Preço (R$)",
         xaxis_title="Data",
@@ -166,9 +171,10 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         height=400,
         hovermode="x unified",
     )
+    fig_p5.update_xaxes(**AXIS_STYLE)
+    fig_p5.update_yaxes(**AXIS_STYLE)
     st.plotly_chart(fig_p5, use_container_width=True)
 
-    # Insight automático
     first_price = float(df_p5["avg_price"].iloc[0])
     last_price  = float(df_p5["avg_price"].iloc[-1])
     variation   = ((last_price - first_price) / first_price * 100) if first_price else 0
@@ -182,22 +188,22 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         color_ins,
     )
 
-    # KPIs do período
     st.markdown("<br>", unsafe_allow_html=True)
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        kpi_card("📅", "Dias Monitorados", fmt_int(len(df_p5)))
+        kpi_card("📅", "Dias Monitorados", fmt_int(len(df_p5)), accent=BLUE)
     with k2:
         avg_chg = df_p5["avg_price_pct_change"].dropna()
         kpi_card(
             "📉", "Variação Média Diária",
             fmt_pct(float(avg_chg.mean())) if not avg_chg.empty else "—",
             delta_color=GREEN if (not avg_chg.empty and float(avg_chg.mean()) < 0) else RED,
+            accent=PURPLE,
         )
     with k3:
-        kpi_card("🔻", "Menor Preço Registrado", fmt_brl(float(df_p5["min_price"].min())))
+        kpi_card("🔻", "Menor Preço Registrado", fmt_brl(float(df_p5["min_price"].min())), accent=GREEN)
     with k4:
-        kpi_card("🔺", "Maior Preço Registrado", fmt_brl(float(df_p5["max_price"].max())))
+        kpi_card("🔺", "Maior Preço Registrado", fmt_brl(float(df_p5["max_price"].max())), accent=RED)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -207,6 +213,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 section_header(
     "🔀 Variação de Preço por Produto",
     "Produtos com maior oscilação — tendência de alta, baixa ou estável (P7)",
+    AMBER,
 )
 
 sql_p7 = f"""
@@ -232,16 +239,13 @@ sql_p7 = f"""
 """
 df_p7 = run_query(sql_p7)
 
-# Aplica filtros de marca da sidebar no resultado
 if not df_p7.empty and filters["brands"]:
     df_p7 = df_p7[df_p7["brand"].isin(filters["brands"])]
 
 if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço no período."):
-    # ── Tabs: tabela interativa + gráfico de waterfall ─────────────────────
     tab_tbl, tab_chart = st.tabs(["📋 Tabela Interativa", "📊 Gráfico de Variação"])
 
     with tab_tbl:
-        # Ordena por variação absoluta
         df_show = df_p7.copy()
         df_show["trend_icon"] = df_show["price_trend"].map(
             {"subiu": "↑ Subiu", "caiu": "↓ Caiu", "estável": "→ Estável"}
@@ -251,12 +255,11 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             lambda t: (t[:55] + "...") if isinstance(t, str) and len(t) > 55 else t
         )
 
-        # Renderiza tabela HTML estilizada
         st.markdown(
             f"""
             <table style="width:100%;border-collapse:collapse;font-size:.83rem">
               <thead>
-                <tr style="background:#F1F5F9;color:{TEXT_SEC};font-size:.73rem;text-transform:uppercase">
+                <tr style="background:#2d3748;color:{TEXT_SEC};font-size:.73rem;text-transform:uppercase">
                   <th style="padding:8px 10px;text-align:left">Produto</th>
                   <th style="padding:8px 10px;text-align:left">Marca</th>
                   <th style="padding:8px 10px;text-align:right">Preço Inicial</th>
@@ -272,7 +275,7 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             unsafe_allow_html=True,
         )
 
-        for _, r in df_show.iterrows():
+        for idx, (_, r) in enumerate(df_show.iterrows()):
             var_pct = float(r["price_variation_pct"]) if r["price_variation_pct"] is not None else 0
             trend   = str(r["trend_icon"])
             trend_color = (
@@ -282,22 +285,23 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             )
             var_str  = f"{'+'if var_pct > 0 else ''}{var_pct:.1f}%".replace(".", ",")
             drop_str = f"-{float(r['max_drop_pct']):.1f}%".replace(".", ",") if r["max_drop_pct"] else "—"
+            bg_row   = "#1a1d2e" if idx % 2 == 0 else "#0f1117"
 
             st.markdown(
                 f"""
-                <tr style="border-bottom:1px solid #F1F5F9">
+                <tr style="border-bottom:1px solid #2d3748;background:{bg_row}">
                   <td style="padding:7px 10px;color:{TEXT_PRI};max-width:220px;
                       overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                     {r['title_short']}
                   </td>
                   <td style="padding:7px 10px;color:{TEXT_SEC}">{r['brand'] or '—'}</td>
-                  <td style="padding:7px 10px;text-align:right">{fmt_brl(r['first_price'])}</td>
-                  <td style="padding:7px 10px;text-align:right">{fmt_brl(r['last_price'])}</td>
+                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_brl(r['first_price'])}</td>
+                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_brl(r['last_price'])}</td>
                   <td style="padding:7px 10px;text-align:right;font-weight:600;
-                      color:{'#DC2626' if var_pct > 0 else '#16A34A' if var_pct < 0 else TEXT_SEC}">
+                      color:{'#ff4757' if var_pct > 0 else '#00d4aa' if var_pct < 0 else TEXT_SEC}">
                     {var_str}
                   </td>
-                  <td style="padding:7px 10px;text-align:right;color:#16A34A">{drop_str}</td>
+                  <td style="padding:7px 10px;text-align:right;color:#00d4aa">{drop_str}</td>
                   <td style="padding:7px 10px;text-align:center;font-weight:600;
                       color:{trend_color}">{trend}</td>
                   <td style="padding:7px 10px;text-align:right;color:{TEXT_SEC}">{fmt_int(r['num_observations'])}</td>
@@ -308,7 +312,6 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
         st.markdown("</tbody></table>", unsafe_allow_html=True)
 
     with tab_chart:
-        # Gráfico de barras horizontal — variação %
         df_chart = df_p7.head(20).copy()
         df_chart["label"] = df_chart["title"].apply(
             lambda t: (t[:40] + "...") if isinstance(t, str) and len(t) > 40 else t
@@ -328,17 +331,19 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             textposition="outside",
             marker_color=colors_p7,
         ))
-        fig_p7.add_vline(x=0, line_width=1, line_dash="solid", line_color="#94A3B8")
+        fig_p7.add_vline(x=0, line_width=1, line_dash="solid", line_color="#4a5568")
         fig_p7.update_layout(
+            **GRAPH_LAYOUT,
             template=PLOTLY_TEMPLATE,
             xaxis_title="Variação de Preço (%)",
             yaxis_title="",
             margin=dict(t=10, b=0, l=0, r=60),
             height=max(320, len(df_chart) * 26),
         )
+        fig_p7.update_xaxes(**AXIS_STYLE)
+        fig_p7.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p7, use_container_width=True)
 
-    # Insight P7
     n_caiu    = (df_p7["price_trend"] == "caiu").sum()
     n_subiu   = (df_p7["price_trend"] == "subiu").sum()
     n_estavel = (df_p7["price_trend"] == "estável").sum()

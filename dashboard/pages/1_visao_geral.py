@@ -16,10 +16,15 @@ import streamlit as st
 
 from utils import (
     AMBER,
+    AXIS_STYLE,
     BLUE,
+    BORDER,
+    BG_CARD,
     BRAND_COLORS,
+    GRAPH_LAYOUT,
     GREEN,
     PLOTLY_TEMPLATE,
+    PURPLE,
     RED,
     TEXT_PRI,
     TEXT_SEC,
@@ -41,9 +46,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.markdown('<style>.block-container{padding-top:1.5rem}</style>', unsafe_allow_html=True)
-
-# ── Sidebar ────────────────────────────────────────────────────────────────
+# ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters = build_sidebar()
 where   = build_where(filters)
 
@@ -51,7 +54,7 @@ where   = build_where(filters)
 # ══════════════════════════════════════════════════════════════════════════
 # P1 — Indicadores de preço (KPI cards)
 # ══════════════════════════════════════════════════════════════════════════
-section_header("📊 Visão Geral do Mercado", "Indicadores agregados do período selecionado")
+section_header("📊 Visão Geral do Mercado", "Indicadores agregados do período selecionado", BLUE)
 
 sql_p1 = f"""
     SELECT
@@ -77,28 +80,29 @@ if not check_empty(df_p1):
     row = df_p1.iloc[0]
     cols = st.columns(5)
     with cols[0]:
-        kpi_card("📦", "Total Produtos", fmt_int(row["total"]))
+        kpi_card("📦", "Total Produtos", fmt_int(row["total"]), accent=BLUE)
     with cols[1]:
-        kpi_card("💰", "Preço Médio", fmt_brl(row["avg_price"]))
+        kpi_card("💰", "Preço Médio", fmt_brl(row["avg_price"]), accent=GREEN)
     with cols[2]:
-        kpi_card("🏷️", "Preço Mínimo", fmt_brl(row["min_price"]))
+        kpi_card("🏷️", "Preço Mínimo", fmt_brl(row["min_price"]), accent=PURPLE)
     with cols[3]:
-        kpi_card("🔝", "Preço Máximo", fmt_brl(row["max_price"]))
+        kpi_card("🔝", "Preço Máximo", fmt_brl(row["max_price"]), accent=RED)
     with cols[4]:
-        kpi_card("⚖️", "Mediana", fmt_brl(row["median_price"]))
+        kpi_card("⚖️", "Mediana", fmt_brl(row["median_price"]), accent=AMBER)
 
     st.markdown("<br>", unsafe_allow_html=True)
     cols2 = st.columns(3)
     with cols2[0]:
-        kpi_card("🚚", "Frete Grátis", fmt_pct(row["pct_free_shipping"]))
+        kpi_card("🚚", "Frete Grátis", fmt_pct(row["pct_free_shipping"]), accent=GREEN)
     with cols2[1]:
-        kpi_card("⭐", "Avaliação Média", f"{float(row['avg_rating']):.2f}".replace(".", ",") if row["avg_rating"] else "—")
+        kpi_card("⭐", "Avaliação Média",
+                 f"{float(row['avg_rating']):.2f}".replace(".", ",") if row["avg_rating"] else "—",
+                 accent=AMBER)
     with cols2[2]:
-        kpi_card("🏷️", "Desconto Médio", fmt_pct(row["avg_discount"]))
+        kpi_card("🏷️", "Desconto Médio", fmt_pct(row["avg_discount"]), accent=PURPLE)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # IQR insight
     if row["p25_price"] and row["p75_price"]:
         insight_box(
             f"50% dos smartphones estão entre {fmt_brl(row['p25_price'])} (P25) e "
@@ -111,7 +115,7 @@ if not check_empty(df_p1):
 # P9 — Histograma de faixas de preço (R$500)
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
-section_header("🗂️ Distribuição por Faixa de Preço", "Concentração de produtos em buckets de R$500 (P9)")
+section_header("🗂️ Distribuição por Faixa de Preço", "Concentração de produtos em buckets de R$500 (P9)", PURPLE)
 
 sql_p9 = f"""
     SELECT
@@ -139,17 +143,20 @@ if not check_empty(df_p9):
         y="total",
         text=df_p9["pct"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
         color="total",
-        color_continuous_scale="Blues",
+        color_continuous_scale="plasma",
         template=PLOTLY_TEMPLATE,
         labels={"label": "Faixa de Preço", "total": "Produtos"},
     )
     fig_p9.update_traces(textposition="outside", marker_line_width=0)
     fig_p9.update_layout(
+        **GRAPH_LAYOUT,
         coloraxis_showscale=False,
         xaxis_tickangle=-35,
         margin=dict(t=20, b=0),
         height=380,
     )
+    fig_p9.update_xaxes(**AXIS_STYLE)
+    fig_p9.update_yaxes(**AXIS_STYLE)
     st.plotly_chart(fig_p9, use_container_width=True)
     insight_box(
         f"A faixa {peak['label']} concentra {fmt_int(peak['total'])} produtos "
@@ -162,7 +169,7 @@ if not check_empty(df_p9):
 # P6 — Distribuição novo × usado
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
-section_header("🔄 Distribuição por Condição", "Proporção e ticket médio por condição (P6)")
+section_header("🔄 Distribuição por Condição", "Proporção e ticket médio por condição (P6)", AMBER)
 
 sql_p6 = f"""
     SELECT
@@ -185,7 +192,7 @@ if not check_empty(df_p6):
         color_map = {"new": BLUE, "used": AMBER}
         label_map = {"new": "Novo", "used": "Usado"}
         df_p6["label"] = df_p6["condition"].map(label_map).fillna(df_p6["condition"])
-        colors = [color_map.get(c, "#94A3B8") for c in df_p6["condition"]]
+        colors = [color_map.get(c, "#4a5568") for c in df_p6["condition"]]
 
         fig_p6 = px.pie(
             df_p6,
@@ -200,6 +207,7 @@ if not check_empty(df_p6):
             textfont_size=13,
         )
         fig_p6.update_layout(
+            **GRAPH_LAYOUT,
             showlegend=False,
             margin=dict(t=10, b=10, l=10, r=10),
             height=320,
@@ -210,14 +218,17 @@ if not check_empty(df_p6):
         st.markdown("<br><br>", unsafe_allow_html=True)
         for _, r in df_p6.iterrows():
             lbl = label_map.get(r["condition"], r["condition"])
+            accent = color_map.get(r["condition"], BLUE)
             st.markdown(
                 f"""
                 <div style="
-                    background:#F8FAFC;border:1px solid #E2E8F0;
-                    border-radius:10px;padding:14px 16px;margin-bottom:10px
+                    background:{BG_CARD};border:1px solid {BORDER};
+                    border-left:3px solid {accent};
+                    border-radius:10px;padding:14px 16px;margin-bottom:10px;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.2);
                 ">
-                    <span style="font-weight:700;font-size:1rem">{lbl}</span>
-                    <span style="float:right;font-weight:600;color:{TEXT_SEC}">{r['pct']:.1f}%</span><br>
+                    <span style="font-weight:700;font-size:1rem;color:{TEXT_PRI}">{lbl}</span>
+                    <span style="float:right;font-weight:600;color:{accent}">{r['pct']:.1f}%</span><br>
                     <span style="font-size:.85rem;color:{TEXT_SEC}">
                         {fmt_int(r['total'])} produtos &nbsp;·&nbsp;
                         Média: {fmt_brl(r['avg_price'])} &nbsp;·&nbsp;
@@ -228,7 +239,6 @@ if not check_empty(df_p6):
                 unsafe_allow_html=True,
             )
 
-    # Insight de diferença de preço
     if len(df_p6) >= 2:
         new_row  = df_p6[df_p6["condition"] == "new"]
         used_row = df_p6[df_p6["condition"] == "used"]
@@ -245,7 +255,7 @@ if not check_empty(df_p6):
 # P2 + P8 — Frete grátis por condição e comparação de preço
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
-section_header("🚚 Frete Grátis", "Proporção por condição e impacto no preço (P2 · P8)")
+section_header("🚚 Frete Grátis", "Proporção por condição e impacto no preço (P2 · P8)", GREEN)
 
 col_left, col_right = st.columns(2)
 
@@ -280,7 +290,7 @@ with col_left:
             color="frete_label",
             barmode="stack",
             text=df_p2["pct_within_condition"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
-            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "#CBD5E1"},
+            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "#4a5568"},
             template=PLOTLY_TEMPLATE,
             labels={
                 "condition_label": "Condição",
@@ -291,10 +301,13 @@ with col_left:
         )
         fig_p2.update_traces(textposition="inside", textfont_size=12)
         fig_p2.update_layout(
+            **GRAPH_LAYOUT,
             margin=dict(t=40, b=0),
             height=320,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         )
+        fig_p2.update_xaxes(**AXIS_STYLE)
+        fig_p2.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p2, use_container_width=True)
 
 # P8 — preço com vs sem frete grátis
@@ -314,7 +327,7 @@ with col_right:
 
     if not check_empty(df_p8, "Sem dados para comparação de preço."):
         df_p8["label"] = df_p8["free_shipping"].map({True: "Frete Grátis", False: "Frete Pago"})
-        colors_p8 = [GREEN if v else "#CBD5E1" for v in df_p8["free_shipping"]]
+        colors_p8 = [GREEN if v else "#4a5568" for v in df_p8["free_shipping"]]
 
         fig_p8 = go.Figure()
         for i, r in df_p8.iterrows():
@@ -327,6 +340,7 @@ with col_right:
                 marker_color=colors_p8[i],
             ))
         fig_p8.update_layout(
+            **GRAPH_LAYOUT,
             template=PLOTLY_TEMPLATE,
             showlegend=False,
             title="Preço médio: frete grátis vs pago (P8)",
@@ -335,9 +349,10 @@ with col_right:
             margin=dict(t=40, b=0),
             height=320,
         )
+        fig_p8.update_xaxes(**AXIS_STYLE)
+        fig_p8.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p8, use_container_width=True)
 
-        # Insight P8
         rows_dict = {bool(r["free_shipping"]): r for _, r in df_p8.iterrows()}
         if True in rows_dict and False in rows_dict:
             avg_free = float(rows_dict[True]["avg_price"])

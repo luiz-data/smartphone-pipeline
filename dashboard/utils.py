@@ -5,11 +5,13 @@ Expõe:
   get_connection()   — conexão singleton com PostgreSQL (cache_resource)
   run_query(sql)     — executa SQL e retorna DataFrame (cache_data ttl=300s)
   build_sidebar()    — renderiza filtros globais e retorna dict de filtros
-  kpi_card(...)      — renderiza um card KPI estilizado
+  kpi_card(...)      — card KPI com efeito flip (frente: valor, verso: delta/contexto)
   fmt_brl(v)         — formata número como R$ 1.234,56
   fmt_pct(v)         — formata número como 12,3%
   check_empty(df)    — exibe mensagem amigável se DataFrame vazio
   build_where(f)     — constrói cláusula WHERE a partir dos filtros
+  GRAPH_LAYOUT       — dict de layout Plotly para tema dark consistente
+  AXIS_STYLE         — dict de estilo de eixos para tema dark
 """
 
 import os
@@ -22,23 +24,33 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Paleta de cores ────────────────────────────────────────────────────────
-BLUE    = "#2563EB"
-GREEN   = "#16A34A"
-RED     = "#DC2626"
-AMBER   = "#D97706"
-SLATE   = "#64748B"
-BORDER  = "#E2E8F0"
-BG_CARD = "#FFFFFF"
-TEXT_PRI = "#1E293B"
-TEXT_SEC = "#64748B"
+# ── Paleta dark mode ───────────────────────────────────────────────────────
+BLUE    = "#4f8ef7"
+GREEN   = "#00d4aa"
+RED     = "#ff4757"
+AMBER   = "#ff6b35"
+PURPLE  = "#7c5cbf"
+SLATE   = "#8892a4"
+BORDER  = "#2d3748"
+BG_CARD = "#1a1d2e"
+BG_PAGE = "#0f1117"
+TEXT_PRI = "#e8eaf6"
+TEXT_SEC = "#8892a4"
 
-PLOTLY_TEMPLATE = "plotly_white"
-PRIMARY_SEQ     = "Blues"   # sequência azul para gráficos de barra
+PLOTLY_TEMPLATE = "plotly_dark"
+PRIMARY_SEQ     = "plasma"
 BRAND_COLORS    = [
-    "#2563EB", "#16A34A", "#DC2626", "#D97706", "#7C3AED",
-    "#0891B2", "#DB2777", "#EA580C", "#65A30D", "#475569",
+    "#4f8ef7", "#00d4aa", "#7c5cbf", "#ff6b35", "#ff4757",
+    "#00cec9", "#fd79a8", "#fdcb6e", "#a29bfe", "#55efc4",
 ]
+
+# Layout padrão Plotly — aplicar em todos os fig.update_layout()
+GRAPH_LAYOUT = dict(
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(26,29,46,0.9)",
+    font=dict(color="#e8eaf6"),
+)
+AXIS_STYLE = dict(gridcolor="#2d3748", linecolor="#2d3748")
 
 
 # ── Conexão PostgreSQL ─────────────────────────────────────────────────────
@@ -116,7 +128,78 @@ def fmt_int(value) -> str:
     return f"{int(value):,}".replace(",", ".")
 
 
-# ── KPI Card ───────────────────────────────────────────────────────────────
+# ── CSS global (dark mode) ─────────────────────────────────────────────────
+
+def _inject_css() -> None:
+    """Injeta CSS global de dark mode — chamado automaticamente por build_sidebar."""
+    st.markdown(
+        """
+        <style>
+        /* ── Layout ──────────────────────────────────────── */
+        .block-container { padding-top: 1.5rem !important; }
+        a { text-decoration: none !important; }
+
+        /* ── Scrollbar ───────────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1d2e; }
+        ::-webkit-scrollbar-thumb { background: #4f8ef7; border-radius: 3px; }
+
+        /* ── Sidebar ─────────────────────────────────────── */
+        section[data-testid="stSidebar"] > div:first-child {
+            background: #1a1d2e !important;
+            border-right: 1px solid #2d3748;
+        }
+
+        /* ── Flip card ───────────────────────────────────── */
+        .flip-card {
+            perspective: 1000px;
+            height: 148px;
+            cursor: default;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 12px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+            background: #1a1d2e;
+            text-align: center;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* ── Table hover ─────────────────────────────────── */
+        tr:hover td {
+            background: rgba(79,142,247,0.08) !important;
+            transition: background 0.15s ease;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ── KPI Card com flip ──────────────────────────────────────────────────────
 
 def kpi_card(
     icon: str,
@@ -125,38 +208,46 @@ def kpi_card(
     delta: str = "",
     delta_color: str = GREEN,
     bg: str = BG_CARD,
+    accent: str = BLUE,
 ) -> None:
-    """Renderiza um card KPI estilizado com ícone, label, valor e delta."""
-    delta_html = (
-        f'<div style="font-size:.78rem;color:{delta_color};'
-        f'margin-top:5px;font-weight:500">{delta}</div>'
-        if delta else ""
-    )
+    """
+    Card KPI com efeito flip 3D.
+    Frente: ícone + label + valor principal.
+    Verso:  delta/contexto (se fornecido) ou repetição do ícone.
+    """
+    if delta:
+        back_content = (
+            f'<div style="font-size:.72rem;color:{TEXT_SEC};text-transform:uppercase;'
+            f'letter-spacing:.06em;margin-bottom:10px">{label}</div>'
+            f'<div style="font-size:1.5rem;font-weight:700;color:{delta_color};'
+            f'line-height:1.1">{delta}</div>'
+        )
+    else:
+        back_content = (
+            f'<div style="font-size:2.2rem;line-height:1;margin-bottom:8px">{icon}</div>'
+            f'<div style="font-size:.72rem;color:{TEXT_SEC};text-transform:uppercase;'
+            f'letter-spacing:.06em">{label}</div>'
+        )
+
     st.markdown(
         f"""
-        <div style="
-            background:{bg};
-            border-radius:12px;
-            border:1px solid {BORDER};
-            padding:22px 12px;
-            text-align:center;
-            box-shadow:0 1px 4px rgba(0,0,0,.06);
-            min-height:148px;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-        ">
-            <div style="font-size:1.6rem;line-height:1">{icon}</div>
-            <div style="
-                font-size:.72rem;color:{TEXT_SEC};font-weight:600;
-                text-transform:uppercase;letter-spacing:.07em;margin-top:6px
-            ">{label}</div>
-            <div style="
-                font-size:1.65rem;font-weight:800;color:{TEXT_PRI};
-                margin-top:4px;line-height:1.1;word-break:break-all
-            ">{value}</div>
-            {delta_html}
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front" style="border-top:3px solid {accent}">
+              <div style="font-size:1.7rem;line-height:1">{icon}</div>
+              <div style="font-size:.7rem;color:{TEXT_SEC};font-weight:600;
+                  text-transform:uppercase;letter-spacing:.07em;margin-top:7px">
+                {label}
+              </div>
+              <div style="font-size:1.5rem;font-weight:800;color:{TEXT_PRI};
+                  margin-top:6px;line-height:1.1;word-break:break-all">
+                {value}
+              </div>
+            </div>
+            <div class="flip-card-back" style="border-top:3px solid {accent}">
+              {back_content}
+            </div>
+          </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -167,23 +258,38 @@ def _spacer(h: int = 16) -> None:
     st.markdown(f'<div style="height:{h}px"></div>', unsafe_allow_html=True)
 
 
-def section_header(title: str, subtitle: str = "") -> None:
-    """Cabeçalho de seção com divisor visual."""
-    st.markdown(f"### {title}")
-    if subtitle:
-        st.markdown(f'<p style="color:{TEXT_SEC};margin-top:-10px">{subtitle}</p>',
-                    unsafe_allow_html=True)
-    st.markdown('<hr style="border:none;border-top:1px solid #E2E8F0;margin:8px 0 18px 0">',
-                unsafe_allow_html=True)
+def section_header(title: str, subtitle: str = "", color: str = BLUE) -> None:
+    """Cabeçalho de seção com banner gradiente e borda colorida."""
+    sub_html = (
+        f'<div style="font-size:.82rem;color:{TEXT_SEC};margin-top:4px">{subtitle}</div>'
+        if subtitle else ""
+    )
+    st.markdown(
+        f"""
+        <div style="
+            background:linear-gradient(135deg,{color}25 0%,{color}08 100%);
+            border-left:4px solid {color};
+            border-radius:0 8px 8px 0;
+            padding:14px 20px;
+            margin-bottom:18px;
+        ">
+            <div style="font-size:1.05rem;font-weight:700;color:{TEXT_PRI}">{title}</div>
+            {sub_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def insight_box(text: str, color: str = BLUE) -> None:
-    """Caixa de insight automático abaixo de cada gráfico."""
+    """Caixa de insight automático com borda colorida e fundo semi-transparente."""
     st.markdown(
         f'<div style="'
-        f'background:{color}11;border-left:4px solid {color};'
-        f'padding:10px 14px;border-radius:0 8px 8px 0;'
-        f'font-size:.85rem;color:{TEXT_PRI};margin-top:6px'
+        f'background:{color}18;border-left:4px solid {color};'
+        f'padding:12px 16px;border-radius:0 8px 8px 0;'
+        f'font-size:.85rem;color:{TEXT_PRI};margin-top:8px;'
+        f'box-shadow:0 2px 12px rgba(0,0,0,0.25);'
+        f'font-style:italic'
         f'">💡 {text}</div>',
         unsafe_allow_html=True,
     )
@@ -203,17 +309,10 @@ def build_sidebar() -> dict:
     """
     Renderiza a sidebar com os filtros globais e retorna um dict com os valores.
     Deve ser chamada no topo de cada página.
-
-    Retorna:
-      {
-        "condition":   "Todos" | "new" | "used",
-        "min_price":   int,
-        "max_price":   int,
-        "brands":      list[str],   # vazio = todas as marcas
-        "period_days": int,
-        "cutoff_date": str,         # ISO date para uso em SQL
-      }
+    Também injeta o CSS global de dark mode.
     """
+    _inject_css()
+
     with st.sidebar:
         st.markdown(
             f'<div style="text-align:center;padding:8px 0 16px">'

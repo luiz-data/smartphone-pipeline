@@ -22,10 +22,12 @@ from utils import (
     GREEN,
     RED,
     AMBER,
+    PURPLE,
     BORDER,
     BG_CARD,
     BRAND_COLORS,
     PLOTLY_TEMPLATE,
+    GRAPH_LAYOUT,
 )
 
 st.set_page_config(
@@ -35,20 +37,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── CSS global ─────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <style>
-      /* Remove padding excessivo do topo */
-      .block-container { padding-top: 1.5rem; }
-      /* Links sem sublinhado nos cards de navegação */
-      a { text-decoration: none !important; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ── Sidebar ────────────────────────────────────────────────────────────────
+# ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters = build_sidebar()
 
 # ── Verificação de conexão ─────────────────────────────────────────────────
@@ -64,19 +53,32 @@ st.markdown(
     f"""
     <div style="
         text-align:center;
-        padding:32px 24px 24px;
-        background:linear-gradient(135deg,#1E40AF 0%,#2563EB 60%,#3B82F6 100%);
+        padding:36px 24px 28px;
+        background:linear-gradient(135deg,#0d1b4b 0%,#1a2a6c 45%,#1e3a8a 100%);
         border-radius:16px;
         margin-bottom:28px;
-        color:#fff;
+        border:1px solid #2d3a6b;
+        box-shadow:0 8px 32px rgba(0,0,0,0.4);
     ">
-        <div style="font-size:3rem;line-height:1;margin-bottom:8px">📱</div>
-        <h1 style="color:#fff;font-size:2rem;font-weight:800;margin:0">
+        <div style="font-size:3.5rem;line-height:1;margin-bottom:10px">📱</div>
+        <h1 style="color:#e8eaf6;font-size:2rem;font-weight:800;margin:0">
             Smartphones BR
         </h1>
-        <p style="color:#BFDBFE;font-size:1rem;margin-top:6px">
+        <p style="color:#93c5fd;font-size:1rem;margin-top:8px">
             Monitoramento de preços na Amazon Brasil via RapidAPI
         </p>
+        <div style="
+            display:inline-block;
+            background:rgba(79,142,247,0.15);
+            border:1px solid rgba(79,142,247,0.3);
+            border-radius:20px;
+            padding:4px 16px;
+            font-size:.78rem;
+            color:#93c5fd;
+            margin-top:10px;
+        ">
+            Collector → Redis → PostgreSQL → dbt → Streamlit
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -104,27 +106,28 @@ if db_ok:
         row = df_kpi.iloc[0]
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1:
-            kpi_card("📦", "Produtos", fmt_int(row["total_produtos"]))
+            kpi_card("📦", "Produtos", fmt_int(row["total_produtos"]), accent=BLUE)
         with c2:
-            kpi_card("💰", "Preço Médio", fmt_brl(row["preco_medio"]))
+            kpi_card("💰", "Preço Médio", fmt_brl(row["preco_medio"]), accent=GREEN)
         with c3:
-            kpi_card("🏷️", "Menor Preço", fmt_brl(row["preco_min"]))
+            kpi_card("🏷️", "Menor Preço", fmt_brl(row["preco_min"]), accent=PURPLE)
         with c4:
-            kpi_card("🏷️", "Marcas", fmt_int(row["total_marcas"]))
+            kpi_card("🏷️", "Marcas", fmt_int(row["total_marcas"]), accent=AMBER)
         with c5:
-            kpi_card("🚚", "Frete Grátis", fmt_pct(row["pct_frete_gratis"]))
+            kpi_card("🚚", "Frete Grátis", fmt_pct(row["pct_frete_gratis"]), accent=GREEN)
     else:
         st.info("ℹ️ Nenhum dado disponível para os filtros selecionados.")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Cards de navegação ─────────────────────────────────────────────────────
-st.markdown("### Páginas do Dashboard")
 st.markdown(
-    f'<p style="color:{TEXT_SEC};margin-top:-10px">Selecione uma análise no menu lateral ou clique abaixo</p>',
+    f'<div style="font-size:1.05rem;font-weight:700;color:{TEXT_PRI};margin-bottom:6px">'
+    f'Páginas do Dashboard</div>'
+    f'<div style="font-size:.85rem;color:{TEXT_SEC};margin-bottom:18px">'
+    f'Selecione uma análise no menu lateral ou clique abaixo</div>',
     unsafe_allow_html=True,
 )
-st.markdown('<hr style="border:none;border-top:1px solid #E2E8F0;margin:8px 0 18px 0">', unsafe_allow_html=True)
 
 nav_cols = st.columns(3)
 
@@ -135,15 +138,13 @@ nav_cards = [
         "desc": "Preços, distribuição por condição, frete grátis e histograma de faixas de preço.",
         "questions": "P1 · P2 · P6 · P8 · P9",
         "color": BLUE,
-        "page": "pages/1_visao_geral.py",
     },
     {
         "icon": "🏆",
         "title": "Marcas & Competitividade",
         "desc": "Ranking de marcas por volume, dispersão desconto × avaliações e score de competitividade.",
         "questions": "P3 · P4 · P10",
-        "color": "#7C3AED",
-        "page": "pages/2_vendedores.py",
+        "color": PURPLE,
     },
     {
         "icon": "📈",
@@ -151,7 +152,6 @@ nav_cards = [
         "desc": "Série temporal de preços com banda de confiança e variação por produto.",
         "questions": "P5 · P7",
         "color": GREEN,
-        "page": "pages/3_evolucao.py",
     },
 ]
 
@@ -162,14 +162,15 @@ for col, card in zip(nav_cols, nav_cards):
             <div style="
                 background:{BG_CARD};
                 border:1px solid {BORDER};
-                border-top:4px solid {card['color']};
+                border-top:3px solid {card['color']};
                 border-radius:12px;
                 padding:24px 16px;
                 min-height:200px;
-                box-shadow:0 1px 4px rgba(0,0,0,.06);
+                box-shadow:0 4px 20px rgba(0,0,0,0.3);
+                transition:transform 0.2s ease,box-shadow 0.2s ease;
             ">
-                <div style="font-size:2rem;line-height:1">{card['icon']}</div>
-                <div style="font-size:1rem;font-weight:700;color:{TEXT_PRI};margin-top:8px">
+                <div style="font-size:2.2rem;line-height:1">{card['icon']}</div>
+                <div style="font-size:1rem;font-weight:700;color:{TEXT_PRI};margin-top:10px">
                     {card['title']}
                 </div>
                 <div style="font-size:.82rem;color:{TEXT_SEC};margin-top:6px;line-height:1.45">
@@ -177,12 +178,13 @@ for col, card in zip(nav_cols, nav_cards):
                 </div>
                 <div style="
                     display:inline-block;
-                    background:{card['color']}18;
+                    background:{card['color']}22;
                     color:{card['color']};
                     font-size:.72rem;font-weight:700;
                     border-radius:20px;
-                    padding:3px 10px;
+                    padding:3px 12px;
                     margin-top:12px;
+                    border:1px solid {card['color']}44;
                 ">{card['questions']}</div>
             </div>
             """,
@@ -192,7 +194,8 @@ for col, card in zip(nav_cols, nav_cards):
 # ── Rodapé ─────────────────────────────────────────────────────────────────
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(
-    f'<div style="text-align:center;font-size:.75rem;color:{TEXT_SEC}">'
+    f'<div style="text-align:center;font-size:.75rem;color:{TEXT_SEC};'
+    f'padding:12px;border-top:1px solid {BORDER}">'
     f'Fonte: Amazon BR via RapidAPI &nbsp;|&nbsp; '
     f'Pipeline: Collector → Redis → PostgreSQL → dbt → Streamlit &nbsp;|&nbsp; '
     f'Cache: 5 min'

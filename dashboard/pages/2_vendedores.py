@@ -14,10 +14,15 @@ import streamlit as st
 
 from utils import (
     AMBER,
+    AXIS_STYLE,
     BLUE,
+    BORDER,
+    BG_CARD,
     BRAND_COLORS,
+    GRAPH_LAYOUT,
     GREEN,
     PLOTLY_TEMPLATE,
+    PURPLE,
     RED,
     TEXT_PRI,
     TEXT_SEC,
@@ -39,9 +44,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.markdown('<style>.block-container{padding-top:1.5rem}</style>', unsafe_allow_html=True)
-
-# ── Sidebar ────────────────────────────────────────────────────────────────
+# ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters = build_sidebar()
 where   = build_where(filters)
 
@@ -49,7 +52,7 @@ where   = build_where(filters)
 # ══════════════════════════════════════════════════════════════════════════
 # P3 — Top 10 marcas por volume
 # ══════════════════════════════════════════════════════════════════════════
-section_header("🏆 Ranking de Marcas", "Top 10 por volume de avaliações e produtos (P3)")
+section_header("🏆 Ranking de Marcas", "Top 10 por volume de avaliações e produtos (P3)", PURPLE)
 
 sql_p3 = f"""
     SELECT
@@ -79,7 +82,7 @@ if not check_empty(df_p3):
             f"""
             <table style="width:100%;border-collapse:collapse;font-size:.85rem">
               <thead>
-                <tr style="background:#F1F5F9;color:{TEXT_SEC};font-size:.75rem;text-transform:uppercase">
+                <tr style="background:#2d3748;color:{TEXT_SEC};font-size:.75rem;text-transform:uppercase">
                   <th style="padding:8px 10px;text-align:left">#</th>
                   <th style="padding:8px 10px;text-align:left">Marca</th>
                   <th style="padding:8px 10px;text-align:right">Produtos</th>
@@ -95,15 +98,16 @@ if not check_empty(df_p3):
         for i, r in df_p3.iterrows():
             rank = i + 1
             medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, f"#{rank}")
+            bg_row = "#1a1d2e" if rank % 2 == 0 else "#0f1117"
             st.markdown(
                 f"""
-                <tr style="border-bottom:1px solid #F1F5F9">
+                <tr style="border-bottom:1px solid #2d3748;background:{bg_row}">
                   <td style="padding:7px 10px;color:{TEXT_SEC}">{medal}</td>
                   <td style="padding:7px 10px;font-weight:600;color:{TEXT_PRI}">{r['brand']}</td>
-                  <td style="padding:7px 10px;text-align:right">{fmt_int(r['total_produtos'])}</td>
-                  <td style="padding:7px 10px;text-align:right">{fmt_int(r['total_avaliacoes'])}</td>
-                  <td style="padding:7px 10px;text-align:right">{fmt_brl(r['avg_price'])}</td>
-                  <td style="padding:7px 10px;text-align:right">{'⭐ ' + str(r['avg_rating']).replace('.',',') if r['avg_rating'] else '—'}</td>
+                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_int(r['total_produtos'])}</td>
+                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_int(r['total_avaliacoes'])}</td>
+                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_brl(r['avg_price'])}</td>
+                  <td style="padding:7px 10px;text-align:right;color:{AMBER}">{'⭐ ' + str(r['avg_rating']).replace('.',',') if r['avg_rating'] else '—'}</td>
                 </tr>
                 """,
                 unsafe_allow_html=True,
@@ -119,18 +123,21 @@ if not check_empty(df_p3):
             orientation="h",
             text=df_p3_sorted["total_avaliacoes"].apply(fmt_int),
             color="total_avaliacoes",
-            color_continuous_scale="Blues",
+            color_continuous_scale="plasma",
             template=PLOTLY_TEMPLATE,
             labels={"total_avaliacoes": "Total de Avaliações", "brand": "Marca"},
         )
         fig_p3.update_traces(textposition="outside", marker_line_width=0)
         fig_p3.update_layout(
+            **GRAPH_LAYOUT,
             coloraxis_showscale=False,
             margin=dict(t=10, b=0, l=0, r=60),
             height=380,
             xaxis_title="Total de Avaliações",
             yaxis_title="",
         )
+        fig_p3.update_xaxes(**AXIS_STYLE)
+        fig_p3.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p3, use_container_width=True)
 
     top = df_p3.iloc[0]
@@ -148,6 +155,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 section_header(
     "📉 Desconto × Volume de Avaliações",
     "Existe correlação entre desconto oferecido e volume de vendas/avaliações? (P4)",
+    AMBER,
 )
 
 sql_p4_scatter = f"""
@@ -217,15 +225,18 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             x=trend_x,
             y=trend_y,
             mode="lines",
-            line=dict(color="#6B7280", width=2, dash="dash"),
+            line=dict(color="#8892a4", width=2, dash="dash"),
             name="Tendência",
         ))
 
     fig_p4.update_layout(
+        **GRAPH_LAYOUT,
         margin=dict(t=10, b=0),
         height=400,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
+    fig_p4.update_xaxes(**AXIS_STYLE)
+    fig_p4.update_yaxes(**AXIS_STYLE)
     st.plotly_chart(fig_p4, use_container_width=True)
 
     if pearson is not None:
@@ -255,6 +266,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 section_header(
     "💎 Custo-Benefício por Marca",
     "Preço médio × avaliação média, tamanho da bolha = competitividade (P10)",
+    GREEN,
 )
 
 sql_p10 = f"""
@@ -275,7 +287,6 @@ sql_p10 = f"""
 df_p10 = run_query(sql_p10)
 
 if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 2 produtos por marca)."):
-    # Aplica filtro de marca da sidebar na consulta de dim_sellers
     if filters["brands"]:
         df_p10 = df_p10[df_p10["brand"].isin(filters["brands"])]
 
@@ -310,13 +321,16 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
             textposition="top center",
             textfont_size=11,
             marker_line_width=1,
-            marker_line_color="white",
+            marker_line_color="rgba(255,255,255,0.2)",
         )
         fig_p10.update_layout(
+            **GRAPH_LAYOUT,
             showlegend=False,
             margin=dict(t=20, b=0),
             height=460,
         )
+        fig_p10.update_xaxes(**AXIS_STYLE)
+        fig_p10.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p10, use_container_width=True)
 
         best = df_p10.iloc[0]
