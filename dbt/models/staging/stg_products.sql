@@ -131,7 +131,12 @@ cleaned as (
         false                                           as seed_flag
 
     from deduped
+    -- Exclui produtos sem preço: não têm valor analítico e violam constraints
+    -- downstream. Produtos recondicionados da Amazon BR frequentemente chegam
+    -- sem preço via endpoint /search.
     where _row_num = 1
+      and price is not null
+      and price::numeric > 0
 
 )
 
