@@ -61,7 +61,7 @@ by_condition as (
         min(price)                                              as min_price,
         max(price)                                              as max_price,
         round(percentile_cont(0.50)
-              within group (order by price), 2)                 as median_price,
+              within group (order by price)::numeric, 2)        as median_price,
 
         -- Desconto
         round(avg(discount_pct),     2)                         as avg_discount_pct,

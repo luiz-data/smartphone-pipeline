@@ -39,12 +39,14 @@ seeds:
     +schema: staging
     historical_prices:
       +column_types:
-        price:          numeric
-        original_price: numeric
-        discount_pct:   numeric
-        rating:         numeric
-        num_ratings:    integer
-        num_offers:     integer
+        collected_at:     timestamptz
+        inserted_at:      timestamptz
+        price:            numeric
+        original_price:   numeric
+        discount_pct:     numeric
+        rating:           numeric
+        num_ratings:      integer
+        num_offers:       integer
         is_best_seller:   boolean
         is_amazon_choice: boolean
         is_prime:         boolean

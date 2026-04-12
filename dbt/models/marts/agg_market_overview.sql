@@ -63,11 +63,11 @@ select
     min(price)                                              as min_price,
     max(price)                                              as max_price,
     round(percentile_cont(0.50)
-          within group (order by price),                 2) as median_price,
+          within group (order by price)::numeric,        2) as median_price,
     round(percentile_cont(0.25)
-          within group (order by price),                 2) as p25_price,
+          within group (order by price)::numeric,        2) as p25_price,
     round(percentile_cont(0.75)
-          within group (order by price),                 2) as p75_price,
+          within group (order by price)::numeric,        2) as p75_price,
 
     -- ── Desconto ─────────────────────────────────────────────────────────
     round(avg(discount_pct),                             2) as avg_discount_pct,

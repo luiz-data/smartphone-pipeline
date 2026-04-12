@@ -32,7 +32,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['amazon_br']
+              arguments:
+                values: ['amazon_br']
 
       - name: collected_at
         description: "Timestamp UTC da coleta."
@@ -62,7 +63,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['new', 'used']
+              arguments:
+                values: ['new', 'used']
 
       - name: url
         description: "URL canônica do produto na Amazon."
