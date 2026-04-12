@@ -198,7 +198,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "price": ":,.0f",
             "condition_label": False,
         },
-        trendline="ols",
+        trendline="lowess",
         trendline_scope="overall",
         color_discrete_map={"Novo": BLUE, "Usado": AMBER},
         template=PLOTLY_TEMPLATE,

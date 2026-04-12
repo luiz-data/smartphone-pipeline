@@ -53,7 +53,7 @@ section_header("📈 Evolução de Preços no Tempo", "Preço médio diário com
 
 sql_p5 = f"""
     SELECT
-        day,
+        collection_date,
         avg_price,
         min_price,
         max_price,
@@ -65,8 +65,8 @@ sql_p5 = f"""
         total_observations,
         only_seed_data
     FROM marts.agg_price_evolution
-    WHERE day >= '{filters['cutoff_date']}'
-    ORDER BY day
+    WHERE collection_date >= '{filters['cutoff_date']}'
+    ORDER BY collection_date
 """
 df_p5 = run_query(sql_p5)
 
@@ -94,7 +94,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
 
     # Banda P25–P75
     fig_p5.add_trace(go.Scatter(
-        x=list(df_p5["day"]) + list(df_p5["day"])[::-1],
+        x=list(df_p5["collection_date"]) + list(df_p5["collection_date"])[::-1],
         y=list(df_p5["p75_price"]) + list(df_p5["p25_price"])[::-1],
         fill="toself",
         fillcolor=f"{BLUE}22",
@@ -105,7 +105,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
 
     # Linha de preço mínimo
     fig_p5.add_trace(go.Scatter(
-        x=df_p5["day"],
+        x=df_p5["collection_date"],
         y=df_p5["min_price"],
         mode="lines",
         line=dict(color=GREEN, dash="dot", width=1),
@@ -115,7 +115,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
 
     # Linha de preço máximo
     fig_p5.add_trace(go.Scatter(
-        x=df_p5["day"],
+        x=df_p5["collection_date"],
         y=df_p5["max_price"],
         mode="lines",
         line=dict(color=RED, dash="dot", width=1),
@@ -132,7 +132,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         marker_colors.append(AMBER if is_seed else BLUE)
 
     fig_p5.add_trace(go.Scatter(
-        x=df_p5["day"],
+        x=df_p5["collection_date"],
         y=df_p5["avg_price"],
         mode="lines+markers",
         line=dict(color=BLUE, width=2.5),
@@ -150,7 +150,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
 
     # Linha da mediana
     fig_p5.add_trace(go.Scatter(
-        x=df_p5["day"],
+        x=df_p5["collection_date"],
         y=df_p5["median_price"],
         mode="lines",
         line=dict(color="#7C3AED", dash="dash", width=1.5),
