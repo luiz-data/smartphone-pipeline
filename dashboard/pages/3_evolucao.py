@@ -97,7 +97,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         x=list(df_p5["collection_date"]) + list(df_p5["collection_date"])[::-1],
         y=list(df_p5["p75_price"]) + list(df_p5["p25_price"])[::-1],
         fill="toself",
-        fillcolor=f"{BLUE}22",
+        fillcolor="rgba(37, 99, 235, 0.13)",
         line=dict(color="rgba(0,0,0,0)"),
         name="P25–P75",
         hoverinfo="skip",

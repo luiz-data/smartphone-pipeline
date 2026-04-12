@@ -7,6 +7,7 @@ Responde às perguntas de negócio:
   P10 — Qual marca oferece melhor custo-benefício (preço × qualidade)?
 """
 
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
@@ -198,8 +199,6 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "price": ":,.0f",
             "condition_label": False,
         },
-        trendline="lowess",
-        trendline_scope="overall",
         color_discrete_map={"Novo": BLUE, "Usado": AMBER},
         template=PLOTLY_TEMPLATE,
         labels={
@@ -208,6 +207,20 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "condition_label": "Condição",
         },
     )
+    # Linha de tendência manual via média móvel (janela=5) — não requer statsmodels
+    if len(df_p4) >= 5:
+        sorted_df = df_p4.sort_values("discount_pct")
+        window = min(5, len(sorted_df))
+        trend_y = np.convolve(sorted_df["num_ratings"], np.ones(window) / window, mode="valid")
+        trend_x = sorted_df["discount_pct"].iloc[window - 1:].values
+        fig_p4.add_trace(go.Scatter(
+            x=trend_x,
+            y=trend_y,
+            mode="lines",
+            line=dict(color="#6B7280", width=2, dash="dash"),
+            name="Tendência",
+        ))
+
     fig_p4.update_layout(
         margin=dict(t=10, b=0),
         height=400,
