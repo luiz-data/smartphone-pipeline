@@ -39,7 +39,7 @@ PLOTLY_TEMPLATE = "plotly_white"
 
 GRAPH_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(248,249,252,0.8)",
+    plot_bgcolor="rgba(248,249,252,0.6)",
     font=dict(family="Inter, sans-serif", color="#4a4b5a", size=10),
     colorway=["#c9a06a", "#e8c48a", "#2ecc71", "#3498db", "#e74c3c", "#9b59b6", "#f39c12"],
     hoverlabel=dict(
@@ -51,7 +51,7 @@ GRAPH_LAYOUT = dict(
 )
 
 AXIS_STYLE = dict(
-    gridcolor="rgba(0,0,0,0.04)",
+    gridcolor="rgba(0,0,0,0.05)",
     linecolor="rgba(0,0,0,0.08)",
     tickcolor="rgba(0,0,0,0)",
     tickfont=dict(color="#9a9aaa", size=9),

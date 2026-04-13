@@ -385,7 +385,7 @@ with col_left:
             color="frete_label",
             barmode="stack",
             text=df_p2["pct_within_condition"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
-            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "rgba(0,0,0,0.08)"},
+            color_discrete_map={"Frete Grátis": "#52b788", "Frete Pago": "rgba(0,0,0,0.08)"},
             template=PLOTLY_TEMPLATE,
             labels={
                 "condition_label": "Condição",
@@ -421,7 +421,7 @@ with col_right:
 
     if not check_empty(df_p8, "Sem dados para comparação de preço."):
         df_p8["label"] = df_p8["free_shipping"].map({True: "Frete Grátis", False: "Frete Pago"})
-        colors_p8 = [GREEN if v else "rgba(0,0,0,0.08)" for v in df_p8["free_shipping"]]
+        colors_p8 = ["#52b788" if v else "rgba(0,0,0,0.1)" for v in df_p8["free_shipping"]]
 
         fig_p8 = go.Figure()
         for i, r in df_p8.iterrows():

@@ -141,7 +141,7 @@ if not check_empty(df_p3):
             orientation="h",
             text=df_p3_sorted["total_avaliacoes"].apply(fmt_int),
             color="total_avaliacoes",
-            color_continuous_scale=[[0, "rgba(201,168,76,0.3)"], [1, GOLD]],
+            color_continuous_scale=[[0, "rgba(201,160,106,0.2)"], [1, "#c9a06a"]],
             template=PLOTLY_TEMPLATE,
             labels={"total_avaliacoes": "Total de Avaliações", "brand": "Marca"},
         )
