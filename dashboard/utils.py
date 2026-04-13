@@ -320,7 +320,7 @@ def _inject_css() -> None:
         /* ── KPI Flip Cards ──────────────────────────────── */
         .kpi-flip {
             perspective: 1200px;
-            height: 136px;
+            height: 172px;
         }
         .kpi-flip-inner {
             position: relative;
@@ -336,7 +336,7 @@ def _inject_css() -> None:
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             border-radius: var(--radius-md);
-            padding: 15px 16px;
+            padding: 18px 20px;
             box-sizing: border-box;
             background: #ffffff;
             border: 1px solid rgba(0,0,0,0.06);
