@@ -1,5 +1,5 @@
 """
-2_vendedores.py — Marcas & Competitividade.
+1_vendedores.py — Marcas & Competitividade.
 
 Responde às perguntas de negócio:
   P3  — Quais as 10 marcas mais vendidas (por volume de avaliações / vendas)?
@@ -16,7 +16,6 @@ from utils import (
     SVG,
     GOLD,
     GOLD_LIGHT,
-    GOLD_MUTED,
     BLUE,
     GREEN,
     RED,
@@ -85,17 +84,16 @@ if not check_empty(df_p3):
     col_tbl, col_bar = st.columns([1, 1])
 
     with col_tbl:
-        # Header da tabela
         st.markdown(
             f"""
             <table style="width:100%;border-collapse:collapse;font-size:0.82rem;table-layout:fixed">
               <colgroup>
-                <col style="width:44px">
-                <col style="width:130px">
-                <col style="width:90px">
-                <col style="width:110px">
+                <col style="width:40px">
                 <col style="width:120px">
-                <col style="width:90px">
+                <col style="width:85px">
+                <col style="width:100px">
+                <col style="width:110px">
+                <col style="width:85px">
               </colgroup>
               <thead>
                 <tr style="background:rgba(201,168,76,0.06);color:{TEXT_SEC};
@@ -153,7 +151,7 @@ if not check_empty(df_p3):
             **GRAPH_LAYOUT,
             coloraxis_showscale=False,
             margin=dict(t=10, b=0, l=0, r=70),
-            height=380,
+            height=360,
             xaxis_title="Total de Avaliações",
             yaxis_title="",
         )
@@ -182,7 +180,7 @@ section_header(
 
 sql_p4_scatter = f"""
     SELECT
-        COALESCE(brand, 'Outros')   AS brand,
+        COALESCE(brand, 'Outros')       AS brand,
         ROUND(discount_pct::numeric, 1) AS discount_pct,
         num_ratings,
         price,
@@ -237,7 +235,6 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "condition_label": "Condição",
         },
     )
-    # Linha de tendência manual via média móvel
     if len(df_p4) >= 5:
         sorted_df = df_p4.sort_values("discount_pct")
         window = min(5, len(sorted_df))
@@ -254,7 +251,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
     fig_p4.update_layout(
         **GRAPH_LAYOUT,
         margin=dict(t=10, b=0),
-        height=400,
+        height=320,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     fig_p4.update_xaxes(**AXIS_STYLE)
@@ -313,9 +310,7 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
     if filters["brands"]:
         df_p10 = df_p10[df_p10["brand"].isin(filters["brands"])]
 
-    if check_empty(df_p10, "Sem dados para as marcas selecionadas."):
-        pass
-    else:
+    if not check_empty(df_p10, "Sem dados para as marcas selecionadas."):
         fig_p10 = px.scatter(
             df_p10,
             x="avg_price",
@@ -350,7 +345,7 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
             **GRAPH_LAYOUT,
             showlegend=False,
             margin=dict(t=20, b=0),
-            height=460,
+            height=340,
         )
         fig_p10.update_xaxes(**AXIS_STYLE)
         fig_p10.update_yaxes(**AXIS_STYLE)
