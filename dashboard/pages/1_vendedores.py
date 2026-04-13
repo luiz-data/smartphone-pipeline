@@ -84,53 +84,49 @@ if not check_empty(df_p3):
     col_tbl, col_bar = st.columns([1, 1])
 
     with col_tbl:
-        st.markdown(
-            f"""
-            <table class="data-table">
-              <colgroup>
-                <col style="width:40px">
-                <col style="width:18%">
-                <col style="width:12%">
-                <col style="width:20%">
-                <col style="width:22%">
-                <col style="width:14%">
-              </colgroup>
-              <thead>
-                <tr>
-                  <th style="text-align:center">#</th>
-                  <th style="text-align:left">Marca</th>
-                  <th style="text-align:right">Produtos</th>
-                  <th style="text-align:right">Avaliações</th>
-                  <th style="text-align:right">Preço Médio</th>
-                  <th style="text-align:center">Rating</th>
-                </tr>
-              </thead>
-              <tbody>
-            """,
-            unsafe_allow_html=True,
-        )
-        rank_labels = {1: "01", 2: "02", 3: "03"}
-        rank_colors = {1: GOLD, 2: "#888899", 3: AMBER}
+        rows_html = ""
         for i, r in df_p3.iterrows():
             rank = i + 1
-            rank_str   = rank_labels.get(rank, f"{rank:02d}")
-            rank_color = rank_colors.get(rank, TEXT_MUT)
-            bg_row = "rgba(0,0,0,0.015)" if rank % 2 == 0 else "transparent"
-            rating_str = f"{str(r['avg_rating']).replace('.', ',')} ★" if r["avg_rating"] else "—"
-            st.markdown(
-                f"""
-                <tr style="background:{bg_row}">
-                  <td style="text-align:center;color:{rank_color};font-weight:700">{rank_str}</td>
-                  <td style="color:{TEXT_PRI};font-weight:600">{r['brand']}</td>
-                  <td style="text-align:right;color:{TEXT_SEC}">{fmt_int(r['total_produtos'])}</td>
-                  <td style="text-align:right;color:{TEXT_PRI};font-weight:500">{fmt_int(r['total_avaliacoes'])}</td>
-                  <td style="text-align:right;color:{TEXT_SEC}">{fmt_brl(r['avg_price'])}</td>
-                  <td style="text-align:center;color:{GOLD}">{rating_str}</td>
-                </tr>
-                """,
-                unsafe_allow_html=True,
-            )
-        st.markdown("</tbody></table>", unsafe_allow_html=True)
+            num = f"0{rank}" if rank < 10 else str(rank)
+            num_color = "#c9a06a;font-weight:700" if rank <= 3 else "#9a9aaa"
+            rating_str = str(r["avg_rating"]).replace(".", ",") if r["avg_rating"] else "—"
+
+            rows_html += f"""
+            <tr>
+              <td style="text-align:center;color:{num_color}">{num}</td>
+              <td style="text-align:left;font-weight:600">{r['brand']}</td>
+              <td style="text-align:right">{fmt_int(r['total_produtos'])}</td>
+              <td style="text-align:right;font-weight:700">{fmt_int(r['total_avaliacoes'])}</td>
+              <td style="text-align:right">{fmt_brl(r['avg_price'])}</td>
+              <td style="text-align:center;color:#c9a06a;font-weight:600">{rating_str} ★</td>
+            </tr>
+            """
+
+        st.markdown(f"""
+<table class="data-table">
+  <colgroup>
+    <col style="width:40px">
+    <col style="width:18%">
+    <col style="width:12%">
+    <col style="width:21%">
+    <col style="width:21%">
+    <col style="width:14%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th style="text-align:center">#</th>
+      <th style="text-align:left">Marca</th>
+      <th style="text-align:right">Produtos</th>
+      <th style="text-align:right">Avaliações</th>
+      <th style="text-align:right">Preço Médio</th>
+      <th style="text-align:center">Rating</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows_html}
+  </tbody>
+</table>
+""", unsafe_allow_html=True)
 
     with col_bar:
         df_p3_sorted = df_p3.sort_values("total_avaliacoes")
