@@ -406,7 +406,7 @@ with col_left:
             texttemplate="%{y:.1f}%",
             textposition="inside",
             textfont=dict(size=11, color="#ffffff"),
-            width=0.35,
+            width=0.4,
         )
         fig_p2.update_layout(
             **GRAPH_LAYOUT,
@@ -416,8 +416,8 @@ with col_left:
                 x=0,
                 pad=dict(l=0, t=0),
             ),
-            bargap=0.5,
-            bargroupgap=0.15,
+            bargap=0.3,
+            bargroupgap=0.05,
             height=320,
             margin=dict(t=36, b=0, l=0, r=0),
             legend=dict(
