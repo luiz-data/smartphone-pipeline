@@ -41,12 +41,6 @@ from utils import (
     section_header,
 )
 
-st.set_page_config(
-    page_title="Evolução",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
 # ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters  = build_sidebar()
 where_fct = build_where(filters)

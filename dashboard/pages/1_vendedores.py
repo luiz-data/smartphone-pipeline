@@ -44,12 +44,6 @@ from utils import (
     section_header,
 )
 
-st.set_page_config(
-    page_title="Vendedores",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
 # ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters = build_sidebar()
 where   = build_where(filters)
