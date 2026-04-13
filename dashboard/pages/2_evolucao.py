@@ -158,7 +158,7 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         xaxis_title="Data",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=20, b=0),
-        height=300,
+        height=360,
         hovermode="x unified",
     )
     fig_p5.update_xaxes(**AXIS_STYLE)
@@ -286,18 +286,28 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
 
         st.markdown(
             f"""
-            <table style="width:100%;border-collapse:collapse;font-size:0.81rem">
+            <table style="width:100%;border-collapse:collapse;font-size:0.81rem;table-layout:fixed">
+              <colgroup>
+                <col style="width:22%">
+                <col style="width:12%">
+                <col style="width:12%">
+                <col style="width:12%">
+                <col style="width:10%">
+                <col style="width:10%">
+                <col style="width:14%">
+                <col style="width:8%">
+              </colgroup>
               <thead>
-                <tr style="background:rgba(201,168,76,0.06);color:{TEXT_SEC};
+                <tr style="background:rgba(201,160,106,0.08);color:{GOLD};
                            font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em">
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER}">Produto</th>
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER}">Marca</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Inicial</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Final</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Variação</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Maior Queda</th>
-                  <th style="padding:10px 12px;text-align:center;border-bottom:1px solid {BORDER}">Tendência</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Obs.</th>
+                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Produto</th>
+                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Marca</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Inicial</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Final</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Variação</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Maior Queda</th>
+                  <th style="padding:10px 12px;text-align:center;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tendência</th>
+                  <th style="padding:10px 12px;text-align:center;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Obs.</th>
                 </tr>
               </thead>
               <tbody>
@@ -311,24 +321,24 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             trend_lbl, trend_color = trend_map.get(trend_key, (trend_key, TEXT_SEC))
             var_str   = f"{'+'if var_pct > 0 else ''}{var_pct:.1f}%".replace(".", ",")
             drop_str  = f"-{float(r['max_drop_pct']):.1f}%".replace(".", ",") if r["max_drop_pct"] else "—"
-            bg_row    = "rgba(201,168,76,0.02)" if idx % 2 == 0 else "transparent"
+            bg_row    = "rgba(0,0,0,0.015)" if idx % 2 == 0 else "transparent"
             var_color = RED if var_pct > 0 else (GREEN if var_pct < 0 else TEXT_SEC)
 
             st.markdown(
                 f"""
                 <tr style="border-bottom:1px solid {BORDER};background:{bg_row}">
-                  <td style="padding:8px 12px;color:{TEXT_PRI};max-width:220px;
+                  <td style="padding:10px 12px;color:{TEXT_PRI};
                       overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
                     {r['title_short']}
                   </td>
-                  <td style="padding:8px 12px;color:{TEXT_SEC}">{r['brand'] or '—'}</td>
-                  <td style="padding:8px 12px;text-align:right;color:{TEXT_SEC}">{fmt_brl(r['first_price'])}</td>
-                  <td style="padding:8px 12px;text-align:right;color:{TEXT_PRI}">{fmt_brl(r['last_price'])}</td>
-                  <td style="padding:8px 12px;text-align:right;font-weight:600;color:{var_color}">{var_str}</td>
-                  <td style="padding:8px 12px;text-align:right;color:{GREEN}">{drop_str}</td>
-                  <td style="padding:8px 12px;text-align:center;font-weight:700;
-                      font-size:0.75rem;color:{trend_color}">{trend_lbl}</td>
-                  <td style="padding:8px 12px;text-align:right;color:{TEXT_MUT}">{fmt_int(r['num_observations'])}</td>
+                  <td style="padding:10px 12px;color:{TEXT_SEC};white-space:nowrap">{r['brand'] or '—'}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap">{fmt_brl(r['first_price'])}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{TEXT_PRI};white-space:nowrap">{fmt_brl(r['last_price'])}</td>
+                  <td style="padding:10px 12px;text-align:right;font-weight:600;color:{var_color};white-space:nowrap">{var_str}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{GREEN};white-space:nowrap">{drop_str}</td>
+                  <td style="padding:10px 12px;text-align:center;font-weight:700;
+                      font-size:0.75rem;color:{trend_color};white-space:nowrap">{trend_lbl}</td>
+                  <td style="padding:10px 12px;text-align:center;color:{TEXT_MUT};white-space:nowrap">{fmt_int(r['num_observations'])}</td>
                 </tr>
                 """,
                 unsafe_allow_html=True,
@@ -356,14 +366,14 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             marker_color=colors_p7,
             textfont=dict(color=TEXT_SEC, size=10),
         ))
-        fig_p7.add_vline(x=0, line_width=1, line_dash="solid", line_color="rgba(255,255,255,0.1)")
+        fig_p7.add_vline(x=0, line_width=1, line_dash="solid", line_color="rgba(0,0,0,0.1)")
         fig_p7.update_layout(
             **GRAPH_LAYOUT,
             template=PLOTLY_TEMPLATE,
             xaxis_title="Variação de Preço (%)",
             yaxis_title="",
             margin=dict(t=10, b=0, l=0, r=60),
-            height=max(300, len(df_chart) * 26),
+            height=max(400, len(df_chart) * 28),
         )
         fig_p7.update_xaxes(**AXIS_STYLE)
         fig_p7.update_yaxes(**AXIS_STYLE)

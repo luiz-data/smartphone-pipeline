@@ -23,39 +23,39 @@ AMBER       = "#fb923c"
 PURPLE      = "#a78bfa"
 TEAL        = "#00c896"
 
-TEXT_PRI      = "#f0f0f0"
-TEXT_SEC      = "#9a9aaa"
-TEXT_MUT      = "#5a5a6a"
-BG_BASE       = "#1a1b21"
-BG_SURFACE    = "#21222a"
-BG_CARD       = "#25262f"
-BG_CARD_HOVER = "#2a2b35"
-BORDER        = "rgba(255,255,255,0.06)"
-BORDER_GOLD   = "rgba(201,160,106,0.25)"
+TEXT_PRI      = "#1a1b21"
+TEXT_SEC      = "#4a4b5a"
+TEXT_MUT      = "#9a9aaa"
+BG_BASE       = "#f5f6fa"
+BG_SURFACE    = "#ffffff"
+BG_CARD       = "#ffffff"
+BG_CARD_HOVER = "#f8f9fc"
+BORDER        = "rgba(0,0,0,0.06)"
+BORDER_GOLD   = "rgba(201,160,106,0.35)"
 
 BRAND_COLORS = [GOLD, GOLD_LIGHT, BLUE, GREEN, RED, PURPLE, AMBER, TEAL, "#34d399", "#60a5fa"]
 
-PLOTLY_TEMPLATE = "plotly_dark"
+PLOTLY_TEMPLATE = "plotly_white"
 
 GRAPH_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(30,28,20,0.4)",
-    font=dict(family="Inter, sans-serif", color="#9a9aaa", size=10),
-    colorway=[GOLD, GOLD_LIGHT, GREEN, BLUE, RED, PURPLE, AMBER],
+    plot_bgcolor="rgba(248,249,252,0.8)",
+    font=dict(family="Inter, sans-serif", color="#4a4b5a", size=10),
+    colorway=["#c9a06a", "#e8c48a", "#2ecc71", "#3498db", "#e74c3c", "#9b59b6", "#f39c12"],
     hoverlabel=dict(
-        bgcolor="#21222a",
+        bgcolor="#ffffff",
         bordercolor="rgba(201,160,106,0.4)",
-        font=dict(color="#f0f0f0", size=11),
+        font=dict(color="#1a1b21", size=11),
         namelength=0,
     ),
 )
 
 AXIS_STYLE = dict(
-    gridcolor="rgba(255,255,255,0.03)",
-    linecolor="rgba(255,255,255,0.05)",
+    gridcolor="rgba(0,0,0,0.04)",
+    linecolor="rgba(0,0,0,0.08)",
     tickcolor="rgba(0,0,0,0)",
-    tickfont=dict(color="#5a5a6a", size=9),
-    zerolinecolor="rgba(255,255,255,0.04)",
+    tickfont=dict(color="#9a9aaa", size=9),
+    zerolinecolor="rgba(0,0,0,0.06)",
 )
 
 # ── Ícones SVG (Feather) ───────────────────────────────────────────────────
@@ -155,24 +155,24 @@ def _inject_css() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
         :root {
-            --bg-base:           #1a1b21;
-            --bg-surface:        #21222a;
-            --bg-card:           #25262f;
-            --bg-card-hover:     #2a2b35;
+            --bg-base:           #f5f6fa;
+            --bg-surface:        #ffffff;
+            --bg-card:           #ffffff;
+            --bg-card-hover:     #f8f9fc;
             --accent-gold:       #c9a06a;
             --accent-gold-light: #e8c48a;
             --accent-gold-dark:  #a07848;
             --accent-green:      #4caf7d;
             --accent-red:        #e05c5c;
             --accent-blue:       #5b8dee;
-            --text-primary:      #f0f0f0;
-            --text-secondary:    #9a9aaa;
-            --text-muted:        #5a5a6a;
-            --border-subtle:     rgba(255,255,255,0.06);
-            --border-gold:       rgba(201,160,106,0.25);
-            --shadow-sm:         0 2px 8px rgba(0,0,0,0.3);
-            --shadow-md:         0 4px 20px rgba(0,0,0,0.4);
-            --shadow-lg:         0 8px 40px rgba(0,0,0,0.5);
+            --text-primary:      #1a1b21;
+            --text-secondary:    #4a4b5a;
+            --text-muted:        #9a9aaa;
+            --border-subtle:     rgba(0,0,0,0.06);
+            --border-gold:       rgba(201,160,106,0.35);
+            --shadow-sm:         0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md:         0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg:         0 8px 40px rgba(0,0,0,0.10);
             --radius-sm:         8px;
             --radius-md:         14px;
             --radius-lg:         20px;
@@ -274,12 +274,13 @@ def _inject_css() -> None:
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-left: 3px solid var(--accent-gold);
+            background: #ffffff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-left: 3px solid #c9a06a;
             border-radius: var(--radius-md);
             padding: 14px 22px;
             margin-bottom: 22px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
         .hero-left {
             display: flex; align-items: center; gap: 14px;
@@ -337,9 +338,9 @@ def _inject_css() -> None:
             border-radius: var(--radius-md);
             padding: 15px 16px;
             box-sizing: border-box;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            box-shadow: var(--shadow-md);
+            background: #ffffff;
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             overflow: hidden;
         }
         .kpi-front::after {
@@ -347,12 +348,12 @@ def _inject_css() -> None:
             position: absolute;
             top: 0; left: 0; right: 0; height: 2px;
             background: linear-gradient(90deg,
-                var(--accent-gold-dark), var(--accent-gold-light), transparent);
+                transparent, rgba(201,160,106,0.4), transparent);
             border-radius: var(--radius-md) var(--radius-md) 0 0;
         }
         .kpi-back {
             transform: rotateY(180deg);
-            background: linear-gradient(135deg, #1e1a0e 0%, #252010 50%, #1a1608 100%);
+            background: linear-gradient(135deg, #fdf8f0 0%, #faf4e8 100%);
             border-color: var(--border-gold);
             display: flex; flex-direction: column;
             justify-content: space-between;
@@ -428,7 +429,7 @@ def _inject_css() -> None:
         }
         .back-comps {
             display: flex; gap: 12px; padding-top: 4px;
-            border-top: 1px solid rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(0,0,0,0.06);
             flex-wrap: wrap;
         }
         .back-comp { display: flex; flex-direction: column; gap: 1px; }
@@ -470,8 +471,7 @@ def _inject_css() -> None:
         .sec-line {
             height: 1px;
             background: linear-gradient(90deg,
-                var(--accent-gold-dark) 0%,
-                rgba(201,160,106,0.08) 50%,
+                #c9a06a 0%, rgba(201,160,106,0.1) 50%,
                 transparent 100%);
             margin-bottom: 16px;
         }
@@ -479,12 +479,12 @@ def _inject_css() -> None:
         /* ── Insight Box ─────────────────────────────────── */
         .insight {
             display: flex; align-items: flex-start; gap: 10px;
-            background: rgba(201,160,106,0.04);
-            border: 1px solid rgba(201,160,106,0.12);
+            background: rgba(201,160,106,0.06);
+            border: 1px solid rgba(201,160,106,0.2);
             border-left: 2px solid var(--accent-gold-dark);
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
             padding: 10px 14px; margin: 10px 0;
-            font-size: 0.77rem; color: var(--text-secondary); line-height: 1.5;
+            font-size: 0.77rem; color: #4a4b5a; line-height: 1.5;
         }
         .insight-dot {
             width: 6px; height: 6px; border-radius: 50%;
@@ -541,7 +541,7 @@ def _inject_css() -> None:
 
         /* ── Table hover ─────────────────────────────────── */
         tr:hover td {
-            background: rgba(201,160,106,0.03) !important;
+            background: rgba(201,160,106,0.04) !important;
             transition: background 0.15s ease;
         }
         </style>

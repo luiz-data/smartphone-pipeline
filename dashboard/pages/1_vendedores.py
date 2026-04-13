@@ -88,22 +88,22 @@ if not check_empty(df_p3):
             f"""
             <table style="width:100%;border-collapse:collapse;font-size:0.82rem;table-layout:fixed">
               <colgroup>
-                <col style="width:40px">
-                <col style="width:120px">
-                <col style="width:85px">
-                <col style="width:100px">
-                <col style="width:110px">
-                <col style="width:85px">
+                <col style="width:44px">
+                <col style="width:22%">
+                <col style="width:14%">
+                <col style="width:20%">
+                <col style="width:22%">
+                <col style="width:16%">
               </colgroup>
               <thead>
-                <tr style="background:rgba(201,168,76,0.06);color:{TEXT_SEC};
+                <tr style="background:rgba(201,160,106,0.08);color:{GOLD};
                            font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em">
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap">#</th>
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap">Marca</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap">Produtos</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap">Avaliações</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap">Preço Médio</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap">Rating</th>
+                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">#</th>
+                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Marca</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Produtos</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Avaliações</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Preço Médio</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Rating</th>
                 </tr>
               </thead>
               <tbody>
@@ -116,17 +116,17 @@ if not check_empty(df_p3):
             rank = i + 1
             rank_str   = rank_labels.get(rank, f"{rank:02d}")
             rank_color = rank_colors.get(rank, TEXT_MUT)
-            bg_row = "rgba(201,168,76,0.03)" if rank % 2 == 0 else "transparent"
+            bg_row = "rgba(0,0,0,0.015)" if rank % 2 == 0 else "transparent"
             rating_str = f"{str(r['avg_rating']).replace('.', ',')} ★" if r["avg_rating"] else "—"
             st.markdown(
                 f"""
                 <tr style="border-bottom:1px solid {BORDER};background:{bg_row}">
-                  <td style="padding:9px 12px;color:{rank_color};font-weight:700;font-size:0.78rem;white-space:nowrap">{rank_str}</td>
-                  <td style="padding:9px 12px;font-weight:600;color:{TEXT_PRI};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{r['brand']}</td>
-                  <td style="padding:9px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap">{fmt_int(r['total_produtos'])}</td>
-                  <td style="padding:9px 12px;text-align:right;color:{TEXT_PRI};font-weight:500;white-space:nowrap">{fmt_int(r['total_avaliacoes'])}</td>
-                  <td style="padding:9px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap">{fmt_brl(r['avg_price'])}</td>
-                  <td style="padding:9px 12px;text-align:right;color:{GOLD};white-space:nowrap">{rating_str}</td>
+                  <td style="padding:10px 12px;color:{rank_color};font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{rank_str}</td>
+                  <td style="padding:10px 12px;font-weight:600;color:{TEXT_PRI};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{r['brand']}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{fmt_int(r['total_produtos'])}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{TEXT_PRI};font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{fmt_int(r['total_avaliacoes'])}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{fmt_brl(r['avg_price'])}</td>
+                  <td style="padding:10px 12px;text-align:right;color:{GOLD};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{rating_str}</td>
                 </tr>
                 """,
                 unsafe_allow_html=True,
@@ -151,12 +151,12 @@ if not check_empty(df_p3):
             **GRAPH_LAYOUT,
             coloraxis_showscale=False,
             margin=dict(t=10, b=0, l=0, r=70),
-            height=360,
+            height=400,
             xaxis_title="Total de Avaliações",
             yaxis_title="",
         )
         fig_p3.update_xaxes(**AXIS_STYLE)
-        fig_p3.update_yaxes(**AXIS_STYLE)
+        fig_p3.update_yaxes(**AXIS_STYLE, tickfont=dict(size=11))
         st.plotly_chart(fig_p3, use_container_width=True)
 
     top = df_p3.iloc[0]
@@ -251,7 +251,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
     fig_p4.update_layout(
         **GRAPH_LAYOUT,
         margin=dict(t=10, b=0),
-        height=320,
+        height=400,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     fig_p4.update_xaxes(**AXIS_STYLE)
@@ -345,7 +345,7 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
             **GRAPH_LAYOUT,
             showlegend=False,
             margin=dict(t=20, b=0),
-            height=340,
+            height=420,
         )
         fig_p10.update_xaxes(**AXIS_STYLE)
         fig_p10.update_yaxes(**AXIS_STYLE)

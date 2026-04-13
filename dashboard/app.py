@@ -243,7 +243,7 @@ if not check_empty(df_p9):
         coloraxis_showscale=False,
         xaxis_tickangle=-35,
         margin=dict(t=20, b=0),
-        height=280,
+        height=320,
     )
     fig_p9.update_xaxes(**AXIS_STYLE)
     fig_p9.update_yaxes(**AXIS_STYLE)
@@ -300,7 +300,7 @@ if not check_empty(df_p6):
             **GRAPH_LAYOUT,
             showlegend=False,
             margin=dict(t=10, b=10, l=10, r=10),
-            height=260,
+            height=300,
         )
         st.plotly_chart(fig_p6, use_container_width=True)
 
@@ -318,7 +318,7 @@ if not check_empty(df_p6):
                     border-radius:12px;
                     padding:16px 18px;
                     margin-bottom:10px;
-                    box-shadow:0 2px 12px rgba(0,0,0,0.3);
+                    box-shadow:0 2px 12px rgba(0,0,0,0.06);
                     backdrop-filter:blur(20px);
                 ">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -385,7 +385,7 @@ with col_left:
             color="frete_label",
             barmode="stack",
             text=df_p2["pct_within_condition"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
-            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "rgba(255,255,255,0.08)"},
+            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "rgba(0,0,0,0.08)"},
             template=PLOTLY_TEMPLATE,
             labels={
                 "condition_label": "Condição",
@@ -398,7 +398,7 @@ with col_left:
         fig_p2.update_layout(
             **GRAPH_LAYOUT,
             margin=dict(t=40, b=0),
-            height=260,
+            height=300,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         )
         fig_p2.update_xaxes(**AXIS_STYLE)
@@ -421,7 +421,7 @@ with col_right:
 
     if not check_empty(df_p8, "Sem dados para comparação de preço."):
         df_p8["label"] = df_p8["free_shipping"].map({True: "Frete Grátis", False: "Frete Pago"})
-        colors_p8 = [GREEN if v else "rgba(255,255,255,0.12)" for v in df_p8["free_shipping"]]
+        colors_p8 = [GREEN if v else "rgba(0,0,0,0.08)" for v in df_p8["free_shipping"]]
 
         fig_p8 = go.Figure()
         for i, r in df_p8.iterrows():
@@ -442,7 +442,7 @@ with col_right:
             yaxis_title="Preço médio (R$)",
             xaxis_title="",
             margin=dict(t=40, b=0),
-            height=260,
+            height=300,
         )
         fig_p8.update_xaxes(**AXIS_STYLE)
         fig_p8.update_yaxes(**AXIS_STYLE)
