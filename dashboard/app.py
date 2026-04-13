@@ -353,7 +353,7 @@ if not check_empty(df_p6):
 st.markdown("<br>", unsafe_allow_html=True)
 section_header("Frete Grátis", "Proporção por condição e impacto no preço (P2 · P8)", GREEN, "truck")
 
-col_left, col_right = st.columns(2)
+col_left, col_right = st.columns([1, 1.4])
 
 with col_left:
     sql_p2 = f"""
@@ -383,26 +383,41 @@ with col_left:
             x="condition_label",
             y="pct_within_condition",
             color="frete_label",
-            barmode="stack",
-            text=df_p2["pct_within_condition"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
-            color_discrete_map={"Frete Grátis": "#52b788", "Frete Pago": "rgba(0,0,0,0.08)"},
+            barmode="group",
+            color_discrete_map={
+                "Frete Grátis": "#52b788",
+                "Frete Pago": "rgba(0,0,0,0.12)",
+            },
             template=PLOTLY_TEMPLATE,
             labels={
-                "condition_label": "Condição",
-                "pct_within_condition": "% dentro da condição",
+                "condition_label": "",
+                "pct_within_condition": "%",
                 "frete_label": "",
             },
-            title="Proporção por condição (P2)",
         )
-        fig_p2.update_traces(textposition="inside", textfont_size=12)
+        fig_p2.update_traces(
+            texttemplate="%{y:.1f}%",
+            textposition="inside",
+            textfont=dict(size=11, color="#ffffff", weight=700),
+            width=0.35,
+        )
         fig_p2.update_layout(
             **GRAPH_LAYOUT,
-            margin=dict(t=40, b=0),
+            bargap=0.4,
+            bargroupgap=0.08,
             height=300,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            margin=dict(t=10, b=0, l=0, r=0),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+                font=dict(size=10),
+            ),
         )
         fig_p2.update_xaxes(**AXIS_STYLE)
-        fig_p2.update_yaxes(**AXIS_STYLE)
+        fig_p2.update_yaxes(**AXIS_STYLE, showticklabels=False)
         st.plotly_chart(fig_p2, use_container_width=True)
 
 with col_right:
@@ -425,27 +440,34 @@ with col_right:
 
         fig_p8 = go.Figure()
         for i, r in df_p8.iterrows():
+            cor = "#52b788" if r["free_shipping"] else "rgba(0,0,0,0.12)"
+            texto = fmt_brl(float(r["avg_price"]))
             fig_p8.add_trace(go.Bar(
                 x=[r["label"]],
                 y=[float(r["avg_price"])],
                 name=r["label"],
-                text=[fmt_brl(r["avg_price"])],
-                textposition="outside",
-                marker_color=colors_p8[i],
-                textfont=dict(color=TEXT_PRI),
+                text=[texto],
+                textposition="inside",
+                textfont=dict(
+                    size=10,
+                    color="#ffffff" if r["free_shipping"] else "#4a4b5a",
+                    weight=700,
+                ),
+                marker_color=cor,
+                width=0.35,
             ))
         fig_p8.update_layout(
             **GRAPH_LAYOUT,
             template=PLOTLY_TEMPLATE,
             showlegend=False,
-            title="Preço médio: frete grátis vs pago (P8)",
-            yaxis_title="Preço médio (R$)",
-            xaxis_title="",
-            margin=dict(t=40, b=0),
+            bargap=0.5,
             height=300,
+            yaxis_title="",
+            xaxis_title="",
+            margin=dict(t=10, b=0, l=0, r=0),
         )
         fig_p8.update_xaxes(**AXIS_STYLE)
-        fig_p8.update_yaxes(**AXIS_STYLE)
+        fig_p8.update_yaxes(**AXIS_STYLE, showticklabels=False)
         st.plotly_chart(fig_p8, use_container_width=True)
 
         rows_dict = {bool(r["free_shipping"]): r for _, r in df_p8.iterrows()}
