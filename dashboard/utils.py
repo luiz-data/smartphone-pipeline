@@ -539,9 +539,40 @@ def _inject_css() -> None:
             border-bottom: 2px solid var(--accent-gold) !important;
         }
 
-        /* ── Table hover ─────────────────────────────────── */
-        tr:hover td {
-            background: rgba(201,160,106,0.04) !important;
+        /* ── Data Table ──────────────────────────────────── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .data-table th {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 10px 12px;
+            text-align: left;
+            background: rgba(201,160,106,0.08);
+            color: var(--accent-gold);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid rgba(201,160,106,0.2);
+        }
+        .data-table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 10px 12px;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+        .data-table tr:nth-child(even) td {
+            background: rgba(0,0,0,0.015);
+        }
+        .data-table tr:hover td {
+            background: rgba(201,160,106,0.04);
             transition: background 0.15s ease;
         }
         </style>

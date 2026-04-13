@@ -286,28 +286,27 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
 
         st.markdown(
             f"""
-            <table style="width:100%;border-collapse:collapse;font-size:0.81rem;table-layout:fixed">
+            <table class="data-table">
               <colgroup>
-                <col style="width:22%">
-                <col style="width:12%">
+                <col style="width:24%">
+                <col style="width:11%">
                 <col style="width:12%">
                 <col style="width:12%">
                 <col style="width:10%">
                 <col style="width:10%">
-                <col style="width:14%">
-                <col style="width:8%">
+                <col style="width:12%">
+                <col style="width:9%">
               </colgroup>
               <thead>
-                <tr style="background:rgba(201,160,106,0.08);color:{GOLD};
-                           font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em">
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Produto</th>
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Marca</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Inicial</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Final</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Variação</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Maior Queda</th>
-                  <th style="padding:10px 12px;text-align:center;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tendência</th>
-                  <th style="padding:10px 12px;text-align:center;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Obs.</th>
+                <tr>
+                  <th style="text-align:left">Produto</th>
+                  <th style="text-align:left">Marca</th>
+                  <th style="text-align:right">Inicial</th>
+                  <th style="text-align:right">Final</th>
+                  <th style="text-align:right">Variação</th>
+                  <th style="text-align:right">Maior Queda</th>
+                  <th style="text-align:center">Tendência</th>
+                  <th style="text-align:center">Obs.</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,19 +325,15 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
 
             st.markdown(
                 f"""
-                <tr style="border-bottom:1px solid {BORDER};background:{bg_row}">
-                  <td style="padding:10px 12px;color:{TEXT_PRI};
-                      overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-                    {r['title_short']}
-                  </td>
-                  <td style="padding:10px 12px;color:{TEXT_SEC};white-space:nowrap">{r['brand'] or '—'}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap">{fmt_brl(r['first_price'])}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{TEXT_PRI};white-space:nowrap">{fmt_brl(r['last_price'])}</td>
-                  <td style="padding:10px 12px;text-align:right;font-weight:600;color:{var_color};white-space:nowrap">{var_str}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{GREEN};white-space:nowrap">{drop_str}</td>
-                  <td style="padding:10px 12px;text-align:center;font-weight:700;
-                      font-size:0.75rem;color:{trend_color};white-space:nowrap">{trend_lbl}</td>
-                  <td style="padding:10px 12px;text-align:center;color:{TEXT_MUT};white-space:nowrap">{fmt_int(r['num_observations'])}</td>
+                <tr style="background:{bg_row}">
+                  <td style="color:{TEXT_PRI}">{r['title_short']}</td>
+                  <td style="color:{TEXT_SEC}">{r['brand'] or '—'}</td>
+                  <td style="text-align:right;color:{TEXT_SEC}">{fmt_brl(r['first_price'])}</td>
+                  <td style="text-align:right;color:{TEXT_PRI}">{fmt_brl(r['last_price'])}</td>
+                  <td style="text-align:right;font-weight:600;color:{var_color}">{var_str}</td>
+                  <td style="text-align:right;color:{GREEN}">{drop_str}</td>
+                  <td style="text-align:center;font-weight:700;font-size:0.75rem;color:{trend_color}">{trend_lbl}</td>
+                  <td style="text-align:center;color:{TEXT_MUT}">{fmt_int(r['num_observations'])}</td>
                 </tr>
                 """,
                 unsafe_allow_html=True,

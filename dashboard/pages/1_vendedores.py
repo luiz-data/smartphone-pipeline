@@ -86,24 +86,23 @@ if not check_empty(df_p3):
     with col_tbl:
         st.markdown(
             f"""
-            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;table-layout:fixed">
+            <table class="data-table">
               <colgroup>
-                <col style="width:44px">
-                <col style="width:22%">
-                <col style="width:14%">
+                <col style="width:40px">
+                <col style="width:18%">
+                <col style="width:12%">
                 <col style="width:20%">
                 <col style="width:22%">
-                <col style="width:16%">
+                <col style="width:14%">
               </colgroup>
               <thead>
-                <tr style="background:rgba(201,160,106,0.08);color:{GOLD};
-                           font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em">
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">#</th>
-                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Marca</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Produtos</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Avaliações</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Preço Médio</th>
-                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Rating</th>
+                <tr>
+                  <th style="text-align:center">#</th>
+                  <th style="text-align:left">Marca</th>
+                  <th style="text-align:right">Produtos</th>
+                  <th style="text-align:right">Avaliações</th>
+                  <th style="text-align:right">Preço Médio</th>
+                  <th style="text-align:center">Rating</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,13 +119,13 @@ if not check_empty(df_p3):
             rating_str = f"{str(r['avg_rating']).replace('.', ',')} ★" if r["avg_rating"] else "—"
             st.markdown(
                 f"""
-                <tr style="border-bottom:1px solid {BORDER};background:{bg_row}">
-                  <td style="padding:10px 12px;color:{rank_color};font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{rank_str}</td>
-                  <td style="padding:10px 12px;font-weight:600;color:{TEXT_PRI};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{r['brand']}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{fmt_int(r['total_produtos'])}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{TEXT_PRI};font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{fmt_int(r['total_avaliacoes'])}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{TEXT_SEC};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{fmt_brl(r['avg_price'])}</td>
-                  <td style="padding:10px 12px;text-align:right;color:{GOLD};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{rating_str}</td>
+                <tr style="background:{bg_row}">
+                  <td style="text-align:center;color:{rank_color};font-weight:700">{rank_str}</td>
+                  <td style="color:{TEXT_PRI};font-weight:600">{r['brand']}</td>
+                  <td style="text-align:right;color:{TEXT_SEC}">{fmt_int(r['total_produtos'])}</td>
+                  <td style="text-align:right;color:{TEXT_PRI};font-weight:500">{fmt_int(r['total_avaliacoes'])}</td>
+                  <td style="text-align:right;color:{TEXT_SEC}">{fmt_brl(r['avg_price'])}</td>
+                  <td style="text-align:center;color:{GOLD}">{rating_str}</td>
                 </tr>
                 """,
                 unsafe_allow_html=True,
