@@ -276,69 +276,66 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
         df_show = df_p7.copy()
         # Trend labels com símbolo de direção
         trend_map = {
-            "subiu":   ("↑ Alta",    RED),
-            "caiu":    ("↓ Queda",   GREEN),
-            "estável": ("→ Estável", TEXT_SEC),
+            "subiu":   "↑ Alta",
+            "caiu":    "↓ Queda",
+            "estável": "→ Estável",
         }
         df_show["title_short"] = df_show["title"].apply(
             lambda t: (t[:55] + "...") if isinstance(t, str) and len(t) > 55 else t
         )
 
-        st.markdown(
-            f"""
-            <table class="data-table">
-              <colgroup>
-                <col style="width:24%">
-                <col style="width:11%">
-                <col style="width:12%">
-                <col style="width:12%">
-                <col style="width:10%">
-                <col style="width:10%">
-                <col style="width:12%">
-                <col style="width:9%">
-              </colgroup>
-              <thead>
-                <tr>
-                  <th style="text-align:left">Produto</th>
-                  <th style="text-align:left">Marca</th>
-                  <th style="text-align:right">Inicial</th>
-                  <th style="text-align:right">Final</th>
-                  <th style="text-align:right">Variação</th>
-                  <th style="text-align:right">Maior Queda</th>
-                  <th style="text-align:center">Tendência</th>
-                  <th style="text-align:center">Obs.</th>
-                </tr>
-              </thead>
-              <tbody>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        rows_html = ""
         for idx, (_, r) in enumerate(df_show.iterrows()):
-            var_pct   = float(r["price_variation_pct"]) if r["price_variation_pct"] is not None else 0
-            trend_key = str(r["price_trend"])
-            trend_lbl, trend_color = trend_map.get(trend_key, (trend_key, TEXT_SEC))
-            var_str   = f"{'+'if var_pct > 0 else ''}{var_pct:.1f}%".replace(".", ",")
-            drop_str  = f"-{float(r['max_drop_pct']):.1f}%".replace(".", ",") if r["max_drop_pct"] else "—"
-            bg_row    = "rgba(0,0,0,0.015)" if idx % 2 == 0 else "transparent"
-            var_color = RED if var_pct > 0 else (GREEN if var_pct < 0 else TEXT_SEC)
+            var_pct = float(r["price_variation_pct"]) if r["price_variation_pct"] is not None else 0
+            var_color = "#2ecc71" if var_pct < 0 else "#e05c5c" if var_pct > 0 else "#9a9aaa"
+            trend = trend_map.get(str(r["price_trend"]), str(r["price_trend"]))
+            trend_color = "#2ecc71" if "Alta" in trend else "#e05c5c" if "Queda" in trend else "#9a9aaa"
+            var_str = f"{'+'if var_pct>0 else ''}{var_pct:.1f}%".replace(".", ",")
+            drop_str = f"-{float(r['max_drop_pct']):.1f}%".replace(".", ",") if r["max_drop_pct"] else "—"
+            obs_str = fmt_int(r["num_observations"])
 
-            st.markdown(
-                f"""
-                <tr style="background:{bg_row}">
-                  <td style="color:{TEXT_PRI}">{r['title_short']}</td>
-                  <td style="color:{TEXT_SEC}">{r['brand'] or '—'}</td>
-                  <td style="text-align:right;color:{TEXT_SEC}">{fmt_brl(r['first_price'])}</td>
-                  <td style="text-align:right;color:{TEXT_PRI}">{fmt_brl(r['last_price'])}</td>
-                  <td style="text-align:right;font-weight:600;color:{var_color}">{var_str}</td>
-                  <td style="text-align:right;color:{GREEN}">{drop_str}</td>
-                  <td style="text-align:center;font-weight:700;font-size:0.75rem;color:{trend_color}">{trend_lbl}</td>
-                  <td style="text-align:center;color:{TEXT_MUT}">{fmt_int(r['num_observations'])}</td>
-                </tr>
-                """,
-                unsafe_allow_html=True,
-            )
-        st.markdown("</tbody></table>", unsafe_allow_html=True)
+            rows_html += f"""
+            <tr>
+              <td style="text-align:left">{r['title_short']}</td>
+              <td style="text-align:left;color:#9a9aaa">{r['brand'] or '—'}</td>
+              <td style="text-align:right">{fmt_brl(r['first_price'])}</td>
+              <td style="text-align:right;font-weight:600">{fmt_brl(r['last_price'])}</td>
+              <td style="text-align:right;font-weight:700;color:{var_color}">{var_str}</td>
+              <td style="text-align:right;color:#2ecc71">{drop_str}</td>
+              <td style="text-align:center;font-weight:700;color:{trend_color}">{trend}</td>
+              <td style="text-align:center;color:#9a9aaa">{obs_str}</td>
+            </tr>
+            """
+
+        st.markdown(f"""
+<table class="data-table">
+  <colgroup>
+    <col style="width:24%">
+    <col style="width:11%">
+    <col style="width:12%">
+    <col style="width:12%">
+    <col style="width:10%">
+    <col style="width:10%">
+    <col style="width:12%">
+    <col style="width:9%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th style="text-align:left">Produto</th>
+      <th style="text-align:left">Marca</th>
+      <th style="text-align:right">Inicial</th>
+      <th style="text-align:right">Final</th>
+      <th style="text-align:right">Variação</th>
+      <th style="text-align:right">Maior Queda</th>
+      <th style="text-align:center">Tendência</th>
+      <th style="text-align:center">Obs.</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows_html}
+  </tbody>
+</table>
+""", unsafe_allow_html=True)
 
     with tab_chart:
         df_chart = df_p7.head(20).copy()
