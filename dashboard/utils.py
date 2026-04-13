@@ -575,6 +575,84 @@ def _inject_css() -> None:
             background: rgba(201,160,106,0.04);
             transition: background 0.15s ease;
         }
+
+        /* ── SIDEBAR GLOBAL ──────────────────────── */
+        section[data-testid="stSidebar"] {
+            background: #ffffff;
+            border-right: 1px solid rgba(0,0,0,0.06);
+            padding-top: 8px;
+        }
+
+        /* ── NAVEGAÇÃO — itens do menu ───────────── */
+        section[data-testid="stSidebar"] nav a {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 2px 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4a4b5a;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        section[data-testid="stSidebar"] nav a:hover {
+            background: rgba(201,160,106,0.08);
+            color: #c9a06a;
+        }
+
+        section[data-testid="stSidebar"] nav a[aria-current="page"] {
+            background: rgba(201,160,106,0.12);
+            color: #c9a06a;
+            font-weight: 700;
+            border-left: 3px solid #c9a06a;
+            padding-left: 9px;
+        }
+
+        /* ── SEPARADOR entre logo e nav ──────────── */
+        section[data-testid="stSidebar"] nav {
+            padding: 8px 0;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            margin-top: 8px;
+        }
+
+        /* ── LABELS DOS FILTROS ──────────────────── */
+        section[data-testid="stSidebar"] .stSelectbox label,
+        section[data-testid="stSidebar"] .stSlider label,
+        section[data-testid="stSidebar"] .stMultiSelect label {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+            color: #9a9aaa !important;
+        }
+
+        /* ── SELECTBOX e SLIDER ──────────────────── */
+        section[data-testid="stSidebar"] .stSelectbox > div > div {
+            border-radius: 8px !important;
+            border-color: rgba(0,0,0,0.08) !important;
+            font-size: 0.85rem !important;
+        }
+
+        section[data-testid="stSidebar"] .stSelectbox > div > div:focus-within {
+            border-color: #c9a06a !important;
+            box-shadow: 0 0 0 1px rgba(201,160,106,0.3) !important;
+        }
+
+        /* ── ESPAÇAMENTO entre filtros ───────────── */
+        section[data-testid="stSidebar"] .stSelectbox,
+        section[data-testid="stSidebar"] .stSlider,
+        section[data-testid="stSidebar"] .stMultiSelect {
+            margin-bottom: 12px !important;
+        }
+
+        /* ── RODAPÉ DO SIDEBAR ───────────────────── */
+        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] > div:last-child {
+            border-top: 1px solid rgba(0,0,0,0.06);
+            padding-top: 12px;
+            margin-top: 8px;
+        }
         </style>
         """,
         unsafe_allow_html=True,
