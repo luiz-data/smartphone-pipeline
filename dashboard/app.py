@@ -408,61 +408,73 @@ with col_left:
             color="frete_label",
             barmode="group",
             color_discrete_map={
-                "Frete Grátis": "#52b788",
-                "Frete Pago": "rgba(0,0,0,0.12)",
+                "Frete Grátis": "#58A47E",
+                "Frete Pago":   "#D1D5DB",
             },
-            template=PLOTLY_TEMPLATE,
+            template="plotly_white",
             labels={
-                "condition_label": "",
-                "pct_within_condition": "%",
-                "frete_label": "",
+                "condition_label":       "",
+                "pct_within_condition":  "%",
+                "frete_label":           "",
             },
         )
         fig_p2.update_traces(
             texttemplate="%{y:.1f}%",
-            textposition="inside",
-            textfont=dict(size=11, color="#ffffff"),
-            width=0.4,
+            textposition="outside",
+            textfont=dict(size=12, color="#374151"),
+            marker=dict(
+                line=dict(width=0),
+                cornerradius=4,
+            ),
+            width=0.32,
         )
         fig_p2.update_layout(
-            **GRAPH_LAYOUT,
-            title=dict(
-                text="Proporção com frete grátis por condição",
-                font=dict(size=11, color="#4a4b5a"),
-                x=0,
-                pad=dict(l=0, t=0),
-            ),
-            bargap=0.3,
-            bargroupgap=0.05,
-            height=320,
-            margin=dict(t=36, b=0, l=0, r=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="#F9FAFB",
+            bargap=0.35,
+            bargroupgap=0.08,
+            height=340,
+            margin=dict(t=48, b=16, l=8, r=16),
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=1.05,
+                y=1.08,
                 xanchor="right",
                 x=1,
-                font=dict(size=10, color="#4a4b5a"),
+                font=dict(size=11, color="#374151"),
                 bgcolor="rgba(0,0,0,0)",
                 borderwidth=0,
+                itemsizing="constant",
             ),
             yaxis=dict(
-                title="Proporção (%)",
-                title_font=dict(size=10, color="#9a9aaa"),
+                title="",
                 ticksuffix="%",
-                tickfont=dict(size=9, color="#9a9aaa"),
-                gridcolor="rgba(0,0,0,0.05)",
-                linecolor="rgba(0,0,0,0.08)",
+                tickfont=dict(size=10, color="#9CA3AF"),
+                gridcolor="rgba(0,0,0,0.06)",
+                gridwidth=1,
+                griddash="dot",
+                linecolor="rgba(0,0,0,0)",
+                range=[0, 90],
+                dtick=20,
                 showticklabels=True,
+                zeroline=False,
             ),
             xaxis=dict(
                 title="",
-                tickfont=dict(size=10, color="#4a4b5a"),
+                tickfont=dict(size=12, color="#374151"),
                 linecolor="rgba(0,0,0,0.08)",
+                showgrid=False,
+            ),
+            font=dict(
+                family="Inter, Roboto, sans-serif",
+                color="#374151",
+            ),
+            hoverlabel=dict(
+                bgcolor="#ffffff",
+                bordercolor="rgba(0,0,0,0.1)",
+                font=dict(size=11, color="#1F2937"),
             ),
         )
-        fig_p2.update_xaxes(**AXIS_STYLE)
-        fig_p2.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p2, use_container_width=True)
 
 with col_right:
