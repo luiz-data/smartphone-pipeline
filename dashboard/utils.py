@@ -577,6 +577,31 @@ def _inject_css() -> None:
             transition: background 0.15s ease;
         }
 
+        /* ── MATERIAL SYMBOLS ROUNDED — restaura fonte ícone ── */
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+        [data-testid="stSidebarNavLinkIcon"],
+        span.material-symbols-rounded,
+        span[class*="material-symbol"],
+        [data-testid="stSidebarNavLink"] span:first-child {
+            font-family: "Material Symbols Rounded" !important;
+            font-style: normal !important;
+            font-weight: 300 !important;
+            font-size: 20px !important;
+            line-height: 1 !important;
+            letter-spacing: normal !important;
+            text-transform: none !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-wrap: normal !important;
+            direction: ltr !important;
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24 !important;
+            -webkit-font-smoothing: antialiased !important;
+            overflow: visible !important;
+            width: auto !important;
+            min-width: 24px !important;
+        }
+
         /* ── SIDEBAR BASE ─────────────────────────── */
         section[data-testid="stSidebar"] {
             background: #ffffff;
