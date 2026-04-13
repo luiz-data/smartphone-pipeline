@@ -54,8 +54,39 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-[data-testid="stSidebarNavItems"] li:first-child a span { visibility: hidden; }
-[data-testid="stSidebarNavItems"] li:first-child a span::after { content: "Visão Geral"; visibility: visible; }
+/* Streamlit 1.36+ — stSidebarNavLink */
+[data-testid="stSidebarNavLink"]:first-child
+  [data-testid="stSidebarNavLinkText"] {
+  font-size: 0 !important;
+}
+[data-testid="stSidebarNavLink"]:first-child
+  [data-testid="stSidebarNavLinkText"]::after {
+  content: "Visão Geral";
+  font-size: 0.875rem !important;
+  color: inherit;
+}
+/* Streamlit legacy — nav ul li */
+section[data-testid="stSidebar"] nav ul li:first-child a p {
+  visibility: hidden;
+  position: relative;
+}
+section[data-testid="stSidebar"] nav ul li:first-child a p::after {
+  content: "Visão Geral";
+  visibility: visible;
+  position: absolute;
+  left: 0;
+}
+/* Streamlit 1.50 — stSidebarNavItems span */
+[data-testid="stSidebarNavItems"] li:first-child a span {
+  visibility: hidden;
+  position: relative;
+}
+[data-testid="stSidebarNavItems"] li:first-child a span::after {
+  content: "Visão Geral";
+  visibility: visible;
+  position: absolute;
+  left: 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
