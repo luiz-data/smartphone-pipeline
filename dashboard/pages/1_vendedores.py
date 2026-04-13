@@ -156,7 +156,8 @@ if not check_empty(df_p3):
             yaxis_title="",
         )
         fig_p3.update_xaxes(**AXIS_STYLE)
-        fig_p3.update_yaxes(**AXIS_STYLE, tickfont=dict(size=11))
+        _axis_p3 = {**AXIS_STYLE, "tickfont": dict(color="#9a9aaa", size=11)}
+        fig_p3.update_yaxes(**_axis_p3)
         st.plotly_chart(fig_p3, use_container_width=True)
 
     top = df_p3.iloc[0]
