@@ -15,19 +15,26 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from utils import (
-    AMBER,
-    AXIS_STYLE,
+    SVG,
+    GOLD,
+    GOLD_LIGHT,
+    GOLD_MUTED,
     BLUE,
+    GREEN,
+    RED,
+    AMBER,
+    PURPLE,
     BORDER,
+    BORDER_GOLD,
     BG_CARD,
+    BG_SURFACE,
     BRAND_COLORS,
     GRAPH_LAYOUT,
-    GREEN,
     PLOTLY_TEMPLATE,
-    PURPLE,
-    RED,
+    AXIS_STYLE,
     TEXT_PRI,
     TEXT_SEC,
+    TEXT_MUT,
     build_sidebar,
     build_where,
     check_empty,
@@ -54,7 +61,7 @@ where   = build_where(filters)
 # ══════════════════════════════════════════════════════════════════════════
 # P1 — Indicadores de preço (KPI cards)
 # ══════════════════════════════════════════════════════════════════════════
-section_header("📊 Visão Geral do Mercado", "Indicadores agregados do período selecionado", BLUE)
+section_header("Visão Geral do Mercado", "Indicadores agregados do período selecionado", GOLD, "pie_chart")
 
 sql_p1 = f"""
     SELECT
@@ -80,26 +87,28 @@ if not check_empty(df_p1):
     row = df_p1.iloc[0]
     cols = st.columns(5)
     with cols[0]:
-        kpi_card("📦", "Total Produtos", fmt_int(row["total"]), accent=BLUE)
+        kpi_card("package", "Total Produtos", fmt_int(row["total"]), warm=True)
     with cols[1]:
-        kpi_card("💰", "Preço Médio", fmt_brl(row["avg_price"]), accent=GREEN)
+        kpi_card("dollar", "Preço Médio", fmt_brl(row["avg_price"]), warm=True)
     with cols[2]:
-        kpi_card("🏷️", "Preço Mínimo", fmt_brl(row["min_price"]), accent=PURPLE)
+        kpi_card("tag", "Preço Mínimo", fmt_brl(row["min_price"]), icon_color="green")
     with cols[3]:
-        kpi_card("🔝", "Preço Máximo", fmt_brl(row["max_price"]), accent=RED)
+        kpi_card("trending_up", "Preço Máximo", fmt_brl(row["max_price"]), icon_color="red")
     with cols[4]:
-        kpi_card("⚖️", "Mediana", fmt_brl(row["median_price"]), accent=AMBER)
+        kpi_card("layers", "Mediana", fmt_brl(row["median_price"]), icon_color="blue")
 
     st.markdown("<br>", unsafe_allow_html=True)
     cols2 = st.columns(3)
     with cols2[0]:
-        kpi_card("🚚", "Frete Grátis", fmt_pct(row["pct_free_shipping"]), accent=GREEN)
+        kpi_card("truck", "Frete Grátis", fmt_pct(row["pct_free_shipping"]), icon_color="green")
     with cols2[1]:
-        kpi_card("⭐", "Avaliação Média",
-                 f"{float(row['avg_rating']):.2f}".replace(".", ",") if row["avg_rating"] else "—",
-                 accent=AMBER)
+        kpi_card(
+            "star", "Avaliação Média",
+            f"{float(row['avg_rating']):.2f}".replace(".", ",") if row["avg_rating"] else "—",
+            icon_color="",
+        )
     with cols2[2]:
-        kpi_card("🏷️", "Desconto Médio", fmt_pct(row["avg_discount"]), accent=PURPLE)
+        kpi_card("percent", "Desconto Médio", fmt_pct(row["avg_discount"]), icon_color="purple")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -115,7 +124,7 @@ if not check_empty(df_p1):
 # P9 — Histograma de faixas de preço (R$500)
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
-section_header("🗂️ Distribuição por Faixa de Preço", "Concentração de produtos em buckets de R$500 (P9)", PURPLE)
+section_header("Distribuição por Faixa de Preço", "Concentração de produtos em buckets de R$500 (P9)", GOLD, "bar_chart")
 
 sql_p9 = f"""
     SELECT
@@ -143,7 +152,7 @@ if not check_empty(df_p9):
         y="total",
         text=df_p9["pct"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
         color="total",
-        color_continuous_scale="plasma",
+        color_continuous_scale=[[0, "rgba(201,168,76,0.3)"], [1, "#c9a84c"]],
         template=PLOTLY_TEMPLATE,
         labels={"label": "Faixa de Preço", "total": "Produtos"},
     )
@@ -169,7 +178,7 @@ if not check_empty(df_p9):
 # P6 — Distribuição novo × usado
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
-section_header("🔄 Distribuição por Condição", "Proporção e ticket médio por condição (P6)", AMBER)
+section_header("Distribuição por Condição", "Proporção e ticket médio por condição (P6)", GOLD, "refresh")
 
 sql_p6 = f"""
     SELECT
@@ -189,7 +198,7 @@ if not check_empty(df_p6):
     col_pie, col_tbl = st.columns([1, 1])
 
     with col_pie:
-        color_map = {"new": BLUE, "used": AMBER}
+        color_map = {"new": BLUE, "used": GOLD}
         label_map = {"new": "Novo", "used": "Usado"}
         df_p6["label"] = df_p6["condition"].map(label_map).fillna(df_p6["condition"])
         colors = [color_map.get(c, "#4a5568") for c in df_p6["condition"]]
@@ -203,7 +212,7 @@ if not check_empty(df_p6):
         )
         fig_p6.update_traces(
             textinfo="percent+label",
-            hole=0.42,
+            hole=0.48,
             textfont_size=13,
         )
         fig_p6.update_layout(
@@ -217,23 +226,29 @@ if not check_empty(df_p6):
     with col_tbl:
         st.markdown("<br><br>", unsafe_allow_html=True)
         for _, r in df_p6.iterrows():
-            lbl = label_map.get(r["condition"], r["condition"])
+            lbl    = label_map.get(r["condition"], r["condition"])
             accent = color_map.get(r["condition"], BLUE)
             st.markdown(
                 f"""
                 <div style="
-                    background:{BG_CARD};border:1px solid {BORDER};
+                    background:{BG_CARD};
+                    border:1px solid {BORDER};
                     border-left:3px solid {accent};
-                    border-radius:10px;padding:14px 16px;margin-bottom:10px;
-                    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+                    border-radius:12px;
+                    padding:16px 18px;
+                    margin-bottom:10px;
+                    box-shadow:0 2px 12px rgba(0,0,0,0.3);
+                    backdrop-filter:blur(20px);
                 ">
-                    <span style="font-weight:700;font-size:1rem;color:{TEXT_PRI}">{lbl}</span>
-                    <span style="float:right;font-weight:600;color:{accent}">{r['pct']:.1f}%</span><br>
-                    <span style="font-size:.85rem;color:{TEXT_SEC}">
-                        {fmt_int(r['total'])} produtos &nbsp;·&nbsp;
-                        Média: {fmt_brl(r['avg_price'])} &nbsp;·&nbsp;
-                        Mediana: {fmt_brl(r['median_price'])}
-                    </span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                      <span style="font-weight:700;font-size:0.95rem;color:{TEXT_PRI}">{lbl}</span>
+                      <span style="font-weight:700;font-size:1.0rem;color:{accent}">{r['pct']:.1f}%</span>
+                    </div>
+                    <div style="font-size:0.78rem;color:{TEXT_SEC}">
+                        {fmt_int(r['total'])} produtos
+                        &nbsp;·&nbsp; Média: {fmt_brl(r['avg_price'])}
+                        &nbsp;·&nbsp; Mediana: {fmt_brl(r['median_price'])}
+                    </div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -247,7 +262,7 @@ if not check_empty(df_p6):
             pct  = diff / float(used_row["avg_price"].iloc[0]) * 100
             insight_box(
                 f"Smartphones novos custam em média {fmt_brl(diff)} ({pct:.1f}%) a mais que usados.",
-                AMBER,
+                GOLD,
             )
 
 
@@ -255,7 +270,7 @@ if not check_empty(df_p6):
 # P2 + P8 — Frete grátis por condição e comparação de preço
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
-section_header("🚚 Frete Grátis", "Proporção por condição e impacto no preço (P2 · P8)", GREEN)
+section_header("Frete Grátis", "Proporção por condição e impacto no preço (P2 · P8)", GREEN, "truck")
 
 col_left, col_right = st.columns(2)
 
@@ -290,7 +305,7 @@ with col_left:
             color="frete_label",
             barmode="stack",
             text=df_p2["pct_within_condition"].apply(lambda v: f"{v:.1f}%".replace(".", ",")),
-            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "#4a5568"},
+            color_discrete_map={"Frete Grátis": GREEN, "Frete Pago": "rgba(255,255,255,0.08)"},
             template=PLOTLY_TEMPLATE,
             labels={
                 "condition_label": "Condição",
@@ -327,7 +342,7 @@ with col_right:
 
     if not check_empty(df_p8, "Sem dados para comparação de preço."):
         df_p8["label"] = df_p8["free_shipping"].map({True: "Frete Grátis", False: "Frete Pago"})
-        colors_p8 = [GREEN if v else "#4a5568" for v in df_p8["free_shipping"]]
+        colors_p8 = [GREEN if v else "rgba(255,255,255,0.12)" for v in df_p8["free_shipping"]]
 
         fig_p8 = go.Figure()
         for i, r in df_p8.iterrows():
@@ -338,6 +353,7 @@ with col_right:
                 text=[fmt_brl(r["avg_price"])],
                 textposition="outside",
                 marker_color=colors_p8[i],
+                textfont=dict(color=TEXT_PRI),
             ))
         fig_p8.update_layout(
             **GRAPH_LAYOUT,
@@ -362,5 +378,5 @@ with col_right:
             insight_box(
                 f"Produtos com frete grátis têm preço médio {fmt_brl(abs(diff))} "
                 f"{direction} que produtos sem frete grátis.",
-                GREEN if diff < 0 else AMBER,
+                GREEN if diff < 0 else GOLD,
             )

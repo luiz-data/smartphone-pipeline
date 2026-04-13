@@ -13,19 +13,26 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from utils import (
-    AMBER,
-    AXIS_STYLE,
+    SVG,
+    GOLD,
+    GOLD_LIGHT,
+    GOLD_MUTED,
     BLUE,
+    GREEN,
+    RED,
+    AMBER,
+    PURPLE,
     BORDER,
+    BORDER_GOLD,
     BG_CARD,
+    BG_SURFACE,
     BRAND_COLORS,
     GRAPH_LAYOUT,
-    GREEN,
     PLOTLY_TEMPLATE,
-    PURPLE,
-    RED,
+    AXIS_STYLE,
     TEXT_PRI,
     TEXT_SEC,
+    TEXT_MUT,
     build_sidebar,
     build_where,
     check_empty,
@@ -52,7 +59,7 @@ where   = build_where(filters)
 # ══════════════════════════════════════════════════════════════════════════
 # P3 — Top 10 marcas por volume
 # ══════════════════════════════════════════════════════════════════════════
-section_header("🏆 Ranking de Marcas", "Top 10 por volume de avaliações e produtos (P3)", PURPLE)
+section_header("Ranking de Marcas", "Top 10 por volume de avaliações e produtos (P3)", GOLD, "award")
 
 sql_p3 = f"""
     SELECT
@@ -78,36 +85,42 @@ if not check_empty(df_p3):
     col_tbl, col_bar = st.columns([1, 1])
 
     with col_tbl:
+        # Header da tabela
         st.markdown(
             f"""
-            <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+            <table style="width:100%;border-collapse:collapse;font-size:0.82rem">
               <thead>
-                <tr style="background:#2d3748;color:{TEXT_SEC};font-size:.75rem;text-transform:uppercase">
-                  <th style="padding:8px 10px;text-align:left">#</th>
-                  <th style="padding:8px 10px;text-align:left">Marca</th>
-                  <th style="padding:8px 10px;text-align:right">Produtos</th>
-                  <th style="padding:8px 10px;text-align:right">Avaliações</th>
-                  <th style="padding:8px 10px;text-align:right">Preço Médio</th>
-                  <th style="padding:8px 10px;text-align:right">Rating</th>
+                <tr style="background:rgba(201,168,76,0.06);color:{TEXT_SEC};
+                           font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em">
+                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER}">#</th>
+                  <th style="padding:10px 12px;text-align:left;border-bottom:1px solid {BORDER}">Marca</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Produtos</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Avaliações</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Preço Médio</th>
+                  <th style="padding:10px 12px;text-align:right;border-bottom:1px solid {BORDER}">Rating</th>
                 </tr>
               </thead>
               <tbody>
             """,
             unsafe_allow_html=True,
         )
+        rank_labels = {1: "01", 2: "02", 3: "03"}
+        rank_colors = {1: GOLD, 2: "#888899", 3: AMBER}
         for i, r in df_p3.iterrows():
             rank = i + 1
-            medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, f"#{rank}")
-            bg_row = "#1a1d2e" if rank % 2 == 0 else "#0f1117"
+            rank_str   = rank_labels.get(rank, f"{rank:02d}")
+            rank_color = rank_colors.get(rank, TEXT_MUT)
+            bg_row = "rgba(201,168,76,0.03)" if rank % 2 == 0 else "transparent"
+            rating_str = f"{str(r['avg_rating']).replace('.', ',')} ★" if r["avg_rating"] else "—"
             st.markdown(
                 f"""
-                <tr style="border-bottom:1px solid #2d3748;background:{bg_row}">
-                  <td style="padding:7px 10px;color:{TEXT_SEC}">{medal}</td>
-                  <td style="padding:7px 10px;font-weight:600;color:{TEXT_PRI}">{r['brand']}</td>
-                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_int(r['total_produtos'])}</td>
-                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_int(r['total_avaliacoes'])}</td>
-                  <td style="padding:7px 10px;text-align:right;color:{TEXT_PRI}">{fmt_brl(r['avg_price'])}</td>
-                  <td style="padding:7px 10px;text-align:right;color:{AMBER}">{'⭐ ' + str(r['avg_rating']).replace('.',',') if r['avg_rating'] else '—'}</td>
+                <tr style="border-bottom:1px solid {BORDER};background:{bg_row}">
+                  <td style="padding:9px 12px;color:{rank_color};font-weight:700;font-size:0.78rem">{rank_str}</td>
+                  <td style="padding:9px 12px;font-weight:600;color:{TEXT_PRI}">{r['brand']}</td>
+                  <td style="padding:9px 12px;text-align:right;color:{TEXT_SEC}">{fmt_int(r['total_produtos'])}</td>
+                  <td style="padding:9px 12px;text-align:right;color:{TEXT_PRI};font-weight:500">{fmt_int(r['total_avaliacoes'])}</td>
+                  <td style="padding:9px 12px;text-align:right;color:{TEXT_SEC}">{fmt_brl(r['avg_price'])}</td>
+                  <td style="padding:9px 12px;text-align:right;color:{GOLD}">{rating_str}</td>
                 </tr>
                 """,
                 unsafe_allow_html=True,
@@ -123,15 +136,15 @@ if not check_empty(df_p3):
             orientation="h",
             text=df_p3_sorted["total_avaliacoes"].apply(fmt_int),
             color="total_avaliacoes",
-            color_continuous_scale="plasma",
+            color_continuous_scale=[[0, "rgba(201,168,76,0.3)"], [1, GOLD]],
             template=PLOTLY_TEMPLATE,
             labels={"total_avaliacoes": "Total de Avaliações", "brand": "Marca"},
         )
-        fig_p3.update_traces(textposition="outside", marker_line_width=0)
+        fig_p3.update_traces(textposition="outside", marker_line_width=0, textfont_color=TEXT_SEC)
         fig_p3.update_layout(
             **GRAPH_LAYOUT,
             coloraxis_showscale=False,
-            margin=dict(t=10, b=0, l=0, r=60),
+            margin=dict(t=10, b=0, l=0, r=70),
             height=380,
             xaxis_title="Total de Avaliações",
             yaxis_title="",
@@ -153,9 +166,10 @@ if not check_empty(df_p3):
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
 section_header(
-    "📉 Desconto × Volume de Avaliações",
+    "Desconto × Volume de Avaliações",
     "Existe correlação entre desconto oferecido e volume de vendas/avaliações? (P4)",
-    AMBER,
+    BLUE,
+    "percent",
 )
 
 sql_p4_scatter = f"""
@@ -207,7 +221,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "price": ":,.0f",
             "condition_label": False,
         },
-        color_discrete_map={"Novo": BLUE, "Usado": AMBER},
+        color_discrete_map={"Novo": BLUE, "Usado": GOLD},
         template=PLOTLY_TEMPLATE,
         labels={
             "discount_pct": "Desconto (%)",
@@ -215,7 +229,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "condition_label": "Condição",
         },
     )
-    # Linha de tendência manual via média móvel (janela=5) — não requer statsmodels
+    # Linha de tendência manual via média móvel
     if len(df_p4) >= 5:
         sorted_df = df_p4.sort_values("discount_pct")
         window = min(5, len(sorted_df))
@@ -225,7 +239,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             x=trend_x,
             y=trend_y,
             mode="lines",
-            line=dict(color="#8892a4", width=2, dash="dash"),
+            line=dict(color="rgba(201,168,76,0.6)", width=2, dash="dash"),
             name="Tendência",
         ))
 
@@ -249,7 +263,7 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
             "moderada negativa" if p_val < -0.2 else
             "fraca negativa"
         )
-        color = GREEN if p_val > 0.2 else (RED if p_val < -0.2 else AMBER)
+        color = GREEN if p_val > 0.2 else (RED if p_val < -0.2 else GOLD)
         insight_box(
             f"Correlação de Pearson entre desconto e avaliações: r = {str(pearson).replace('.', ',')} "
             f"— correlação {strength}. "
@@ -264,9 +278,10 @@ if not check_empty(df_p4, "Sem dados suficientes para análise de correlação."
 # ══════════════════════════════════════════════════════════════════════════
 st.markdown("<br>", unsafe_allow_html=True)
 section_header(
-    "💎 Custo-Benefício por Marca",
+    "Custo-Benefício por Marca",
     "Preço médio × avaliação média, tamanho da bolha = competitividade (P10)",
     GREEN,
+    "gem",
 )
 
 sql_p10 = f"""
@@ -313,7 +328,7 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
             template=PLOTLY_TEMPLATE,
             labels={
                 "avg_price": "Preço Médio (R$)",
-                "avg_rating": "Avaliação Média (⭐)",
+                "avg_rating": "Avaliação Média",
                 "brand": "Marca",
             },
         )
@@ -321,7 +336,7 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
             textposition="top center",
             textfont_size=11,
             marker_line_width=1,
-            marker_line_color="rgba(255,255,255,0.2)",
+            marker_line_color=BORDER_GOLD,
         )
         fig_p10.update_layout(
             **GRAPH_LAYOUT,
@@ -338,7 +353,7 @@ if not check_empty(df_p10, "Sem dados de custo-benefício disponíveis (mínimo 
             f"{best['brand']} tem o melhor score de competitividade "
             f"({str(round(float(best['competitiveness_score']), 3)).replace('.', ',')}), "
             f"combinando preço médio de {fmt_brl(best['avg_price'])} com "
-            f"avaliação média de {str(round(float(best['avg_rating']), 2)).replace('.', ',')}⭐. "
+            f"avaliação média de {str(round(float(best['avg_rating']), 2)).replace('.', ',')} estrelas. "
             f"Score = (avaliação × avaliações) ÷ preço.",
             GREEN,
         )
