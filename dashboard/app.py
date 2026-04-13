@@ -424,7 +424,6 @@ with col_left:
             textfont=dict(size=12, color="#374151"),
             marker=dict(
                 line=dict(width=0),
-                cornerradius=4,
             ),
             width=0.32,
         )
