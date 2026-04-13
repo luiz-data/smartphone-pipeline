@@ -294,48 +294,10 @@ if not check_empty(df_p7, "Sem produtos com múltiplas observações de preço n
             drop_str = f"-{float(r['max_drop_pct']):.1f}%".replace(".", ",") if r["max_drop_pct"] else "—"
             obs_str = fmt_int(r["num_observations"])
 
-            rows_html += f"""
-            <tr>
-              <td style="text-align:left">{r['title_short']}</td>
-              <td style="text-align:left;color:#9a9aaa">{r['brand'] or '—'}</td>
-              <td style="text-align:right">{fmt_brl(r['first_price'])}</td>
-              <td style="text-align:right;font-weight:600">{fmt_brl(r['last_price'])}</td>
-              <td style="text-align:right;font-weight:700;color:{var_color}">{var_str}</td>
-              <td style="text-align:right;color:#2ecc71">{drop_str}</td>
-              <td style="text-align:center;font-weight:700;color:{trend_color}">{trend}</td>
-              <td style="text-align:center;color:#9a9aaa">{obs_str}</td>
-            </tr>
-            """
+            rows_html += f'<tr><td style="text-align:left">{r["title_short"]}</td><td style="text-align:left;color:#9a9aaa">{r["brand"] or "—"}</td><td style="text-align:right">{fmt_brl(r["first_price"])}</td><td style="text-align:right;font-weight:600">{fmt_brl(r["last_price"])}</td><td style="text-align:right;font-weight:700;color:{var_color}">{var_str}</td><td style="text-align:right;color:#2ecc71">{drop_str}</td><td style="text-align:center;font-weight:700;color:{trend_color}">{trend}</td><td style="text-align:center;color:#9a9aaa">{obs_str}</td></tr>'
 
-        st.markdown(f"""
-<table class="data-table">
-  <colgroup>
-    <col style="width:24%">
-    <col style="width:11%">
-    <col style="width:12%">
-    <col style="width:12%">
-    <col style="width:10%">
-    <col style="width:10%">
-    <col style="width:12%">
-    <col style="width:9%">
-  </colgroup>
-  <thead>
-    <tr>
-      <th style="text-align:left">Produto</th>
-      <th style="text-align:left">Marca</th>
-      <th style="text-align:right">Inicial</th>
-      <th style="text-align:right">Final</th>
-      <th style="text-align:right">Variação</th>
-      <th style="text-align:right">Maior Queda</th>
-      <th style="text-align:center">Tendência</th>
-      <th style="text-align:center">Obs.</th>
-    </tr>
-  </thead>
-  <tbody>
-    {rows_html}
-  </tbody>
-</table>
-""", unsafe_allow_html=True)
+        table_html = '<table class="data-table"><colgroup><col style="width:24%"><col style="width:11%"><col style="width:12%"><col style="width:12%"><col style="width:10%"><col style="width:10%"><col style="width:12%"><col style="width:9%"></colgroup><thead><tr><th style="text-align:left">Produto</th><th style="text-align:left">Marca</th><th style="text-align:right">Inicial</th><th style="text-align:right">Final</th><th style="text-align:right">Variação</th><th style="text-align:right">Maior Queda</th><th style="text-align:center">Tendência</th><th style="text-align:center">Obs.</th></tr></thead><tbody>' + rows_html + '</tbody></table>'
+        st.markdown(table_html, unsafe_allow_html=True)
 
     with tab_chart:
         df_chart = df_p7.head(20).copy()

@@ -52,6 +52,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+st.markdown("""
+<style>
+[data-testid="stSidebarNavItems"] li:first-child a span { visibility: hidden; }
+[data-testid="stSidebarNavItems"] li:first-child a span::after { content: "Visão Geral"; visibility: visible; }
+</style>
+""", unsafe_allow_html=True)
+
 # ── Sidebar (injeta CSS global) ────────────────────────────────────────────
 filters = build_sidebar()
 where   = build_where(filters)
@@ -398,7 +405,7 @@ with col_left:
         fig_p2.update_traces(
             texttemplate="%{y:.1f}%",
             textposition="inside",
-            textfont=dict(size=11, color="#ffffff", weight=700),
+            textfont=dict(size=11, color="#ffffff"),
             width=0.35,
         )
         fig_p2.update_layout(
@@ -451,7 +458,6 @@ with col_right:
                 textfont=dict(
                     size=10,
                     color="#ffffff" if r["free_shipping"] else "#4a4b5a",
-                    weight=700,
                 ),
                 marker_color=cor,
                 width=0.35,
