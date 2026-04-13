@@ -576,45 +576,84 @@ def _inject_css() -> None:
             transition: background 0.15s ease;
         }
 
-        /* ── SIDEBAR GLOBAL ──────────────────────── */
+        /* ── SIDEBAR BASE ─────────────────────────── */
         section[data-testid="stSidebar"] {
             background: #ffffff;
             border-right: 1px solid rgba(0,0,0,0.06);
-            padding-top: 8px;
+            padding-top: 0;
         }
 
-        /* ── NAVEGAÇÃO — itens do menu ───────────── */
+        section[data-testid="stSidebar"] > div {
+            padding-top: 16px;
+        }
+
+        /* ── NAVEGAÇÃO — container ───────────────── */
+        section[data-testid="stSidebar"] nav {
+            padding: 0 8px;
+        }
+
+        /* ── NAVEGAÇÃO — links ───────────────────── */
         section[data-testid="stSidebar"] nav a {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin: 2px 8px;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 4px;
             font-size: 0.875rem;
             font-weight: 500;
             color: #4a4b5a;
-            text-decoration: none;
-            transition: background 0.2s ease, color 0.2s ease;
+            text-decoration: none !important;
+            transition: background 0.2s ease,
+                        color 0.2s ease,
+                        border 0.2s ease;
+            border-left: 3px solid transparent;
         }
 
+        /* ── HOVER ───────────────────────────────── */
         section[data-testid="stSidebar"] nav a:hover {
-            background: rgba(201,160,106,0.08);
+            background: #f2ede7;
             color: #c9a06a;
+            border-left: 3px solid rgba(201,160,106,0.4);
         }
 
+        /* ── ITEM ATIVO ──────────────────────────── */
         section[data-testid="stSidebar"] nav a[aria-current="page"] {
-            background: rgba(201,160,106,0.12);
+            background: #e8dfd5;
             color: #c9a06a;
             font-weight: 700;
             border-left: 3px solid #c9a06a;
-            padding-left: 9px;
         }
 
-        /* ── SEPARADOR entre logo e nav ──────────── */
-        section[data-testid="stSidebar"] nav {
-            padding: 8px 0;
-            border-top: 1px solid rgba(0,0,0,0.06);
+        section[data-testid="stSidebar"] nav a[aria-current="page"] p {
+            color: #c9a06a !important;
+            font-weight: 700 !important;
+        }
+
+        /* ── TEXTO DOS LINKS ─────────────────────── */
+        section[data-testid="stSidebar"] nav a p {
+            font-size: 0.875rem !important;
+            margin: 0 !important;
+            color: #4a4b5a;
+            transition: color 0.2s ease;
+        }
+
+        section[data-testid="stSidebar"] nav a:hover p {
+            color: #c9a06a !important;
+        }
+
+        /* ── SEPARADOR nav / filtros ─────────────── */
+        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+            padding-top: 8px;
+            border-top: 1px solid #e5e5e5;
             margin-top: 8px;
+        }
+
+        /* ── LOGO / TÍTULO DO SIDEBAR ────────────── */
+        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] > div:first-child {
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 12px;
         }
 
         /* ── LABELS DOS FILTROS ──────────────────── */
@@ -625,33 +664,62 @@ def _inject_css() -> None:
             font-weight: 700 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.08em !important;
-            color: #9a9aaa !important;
+            color: #888888 !important;
+            margin-top: 12px !important;
         }
 
-        /* ── SELECTBOX e SLIDER ──────────────────── */
+        /* ── SELECTBOX ───────────────────────────── */
         section[data-testid="stSidebar"] .stSelectbox > div > div {
             border-radius: 8px !important;
             border-color: rgba(0,0,0,0.08) !important;
             font-size: 0.85rem !important;
+            background: #fafafa !important;
         }
 
         section[data-testid="stSidebar"] .stSelectbox > div > div:focus-within {
             border-color: #c9a06a !important;
-            box-shadow: 0 0 0 1px rgba(201,160,106,0.3) !important;
+            box-shadow: 0 0 0 2px rgba(201,160,106,0.2) !important;
+        }
+
+        /* ── SLIDER ──────────────────────────────── */
+        section[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"] {
+            color: #c9a06a !important;
+            font-weight: 600 !important;
+            font-size: 0.75rem !important;
         }
 
         /* ── ESPAÇAMENTO entre filtros ───────────── */
         section[data-testid="stSidebar"] .stSelectbox,
         section[data-testid="stSidebar"] .stSlider,
         section[data-testid="stSidebar"] .stMultiSelect {
-            margin-bottom: 12px !important;
+            margin-bottom: 8px !important;
         }
 
         /* ── RODAPÉ DO SIDEBAR ───────────────────── */
         section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] > div:last-child {
-            border-top: 1px solid rgba(0,0,0,0.06);
+            border-top: 1px solid #e5e5e5;
             padding-top: 12px;
-            margin-top: 8px;
+            margin-top: 16px;
+            font-size: 0.65rem;
+            color: #9a9aaa;
+        }
+
+        /* ── SCROLLBAR DO SIDEBAR ────────────────── */
+        section[data-testid="stSidebar"]::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        section[data-testid="stSidebar"]::-webkit-scrollbar-track {
+            background: #ffffff;
+        }
+
+        section[data-testid="stSidebar"]::-webkit-scrollbar-thumb {
+            background: rgba(201,160,106,0.3);
+            border-radius: 10px;
+        }
+
+        section[data-testid="stSidebar"]::-webkit-scrollbar-thumb:hover {
+            background: #c9a06a;
         }
         </style>
         """,
