@@ -109,16 +109,40 @@ if not check_empty(df_p3):
             template=PLOTLY_TEMPLATE,
             labels={"total_avaliacoes": "Total de Avaliações", "brand": "Marca"},
         )
+        import math
+        max_val     = int(df_p3["total_avaliacoes"].max())
+        max_rounded = math.ceil(max_val / 500_000) * 500_000
+        tick_vals   = [i * 500_000 for i in range(int(max_rounded / 500_000) + 1)]
+        tick_text   = [
+            f"{int(v / 1_000_000)}M" if v >= 1_000_000
+            else f"{int(v / 1_000)}K" if v >= 1_000
+            else str(int(v))
+            for v in tick_vals
+        ]
+
         fig_p3.update_traces(textposition="outside", marker_line_width=0, textfont_color=TEXT_SEC)
         fig_p3.update_layout(
             **GRAPH_LAYOUT,
             coloraxis_showscale=False,
             margin=dict(t=10, b=0, l=0, r=70),
             height=400,
-            xaxis_title="Total de Avaliações",
             yaxis_title="",
+            xaxis=dict(
+                title="Total de Avaliações",
+                title_font=dict(size=10, color="#9a9aaa"),
+                tickfont=dict(size=9, color="#9a9aaa"),
+                gridcolor="rgba(0,0,0,0.05)",
+                griddash="dot",
+                linecolor="rgba(0,0,0,0.08)",
+                showgrid=True,
+                zeroline=False,
+                rangemode="tozero",
+                range=[0, max_rounded],
+                dtick=500_000,
+                tickvals=tick_vals,
+                ticktext=tick_text,
+            ),
         )
-        fig_p3.update_xaxes(**AXIS_STYLE)
         _axis_p3 = {**AXIS_STYLE, "tickfont": dict(color="#9a9aaa", size=11)}
         fig_p3.update_yaxes(**_axis_p3)
         st.plotly_chart(fig_p3, use_container_width=True)
