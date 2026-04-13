@@ -184,6 +184,8 @@ Este comando constroi as imagens de todos os servicos (collector, consumer, orch
 make up
 ```
 
+> `make up` é equivalente a `docker compose up -d` — sobe todos os serviços em background com um único comando.
+
 Inicia todos os seis servicos em background: postgres, redis, consumer, orchestration, prefect-server e dashboard.
 
 ### Passo 5: Aguardar os servicos ficarem saudaveis
