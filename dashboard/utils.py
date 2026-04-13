@@ -81,6 +81,7 @@ SVG = {
     "gem": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9 6 3z"/><path d="M11 3L8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>',
     "shuffle": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>',
     "alert": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    "keyboard_double_arrow_right": '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.41 6 5 7.41 9.58 12 5 16.59 6.41 18l6-6-6-6zm6 0-1.41 1.41L15.58 12l-4.58 4.59L12.41 18l6-6-6-6z"/></svg>',
 }
 
 
@@ -587,73 +588,36 @@ def _inject_css() -> None:
             padding-top: 16px;
         }
 
-        /* ── NAVEGAÇÃO — container ───────────────── */
-        section[data-testid="stSidebar"] nav {
-            padding: 0 8px;
+        /* ── NAVEGAÇÃO st.navigation() — container ── */
+        [data-testid="stSidebarNav"] {
+            padding: 4px 8px 8px 8px;
         }
 
-        /* ── NAVEGAÇÃO — links ───────────────────── */
-        section[data-testid="stSidebar"] nav a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            margin-bottom: 4px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #4a4b5a;
-            text-decoration: none !important;
-            transition: background 0.2s ease,
-                        color 0.2s ease,
-                        border 0.2s ease;
-            border-left: 3px solid transparent;
+        /* ── NAVEGAÇÃO st.navigation() — links ────── */
+        [data-testid="stSidebarNavLink"] {
+            border-radius: 10px !important;
+            margin-bottom: 2px !important;
+            border-left: 3px solid transparent !important;
+            transition: background 0.2s ease, border-color 0.2s ease !important;
         }
 
         /* ── HOVER ───────────────────────────────── */
-        section[data-testid="stSidebar"] nav a:hover {
-            background: #f2ede7;
-            color: #c9a06a;
-            border-left: 3px solid rgba(201,160,106,0.4);
+        [data-testid="stSidebarNavLink"]:hover {
+            background: #f2ede7 !important;
+            border-left: 3px solid rgba(201,160,106,0.4) !important;
         }
 
         /* ── ITEM ATIVO ──────────────────────────── */
-        section[data-testid="stSidebar"] nav a[aria-current="page"] {
-            background: #e8dfd5;
-            color: #c9a06a;
-            font-weight: 700;
-            border-left: 3px solid #c9a06a;
-        }
-
-        section[data-testid="stSidebar"] nav a[aria-current="page"] p {
-            color: #c9a06a !important;
-            font-weight: 700 !important;
-        }
-
-        /* ── TEXTO DOS LINKS ─────────────────────── */
-        section[data-testid="stSidebar"] nav a p {
-            font-size: 0.875rem !important;
-            margin: 0 !important;
-            color: #4a4b5a;
-            transition: color 0.2s ease;
-        }
-
-        section[data-testid="stSidebar"] nav a:hover p {
-            color: #c9a06a !important;
+        [data-testid="stSidebarNavLink"][aria-current="page"] {
+            background: #e8dfd5 !important;
+            border-left: 3px solid #c9a06a !important;
         }
 
         /* ── SEPARADOR nav / filtros ─────────────── */
-        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+        [data-testid="stSidebarUserContent"] {
             padding-top: 8px;
             border-top: 1px solid #e5e5e5;
-            margin-top: 8px;
-        }
-
-        /* ── LOGO / TÍTULO DO SIDEBAR ────────────── */
-        section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] > div:first-child {
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e5e5e5;
-            margin-bottom: 12px;
+            margin-top: 4px;
         }
 
         /* ── LABELS DOS FILTROS ──────────────────── */
