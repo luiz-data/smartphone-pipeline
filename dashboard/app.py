@@ -286,28 +286,52 @@ if not check_empty(df_p6):
     col_pie, col_tbl = st.columns([1, 1])
 
     with col_pie:
-        color_map = {"new": BLUE, "used": GOLD}
+        color_map = {"new": "#c9a06a", "used": "#52b788"}
         label_map = {"new": "Novo", "used": "Usado"}
         df_p6["label"] = df_p6["condition"].map(label_map).fillna(df_p6["condition"])
-        colors = [color_map.get(c, "#4a5568") for c in df_p6["condition"]]
+        colors = [color_map.get(c, "#9a9aaa") for c in df_p6["condition"]]
 
-        fig_p6 = px.pie(
-            df_p6,
-            names="label",
-            values="total",
-            color_discrete_sequence=colors,
-            template=PLOTLY_TEMPLATE,
+        fig_p6 = go.Figure(data=[go.Pie(
+            labels=df_p6["label"],
+            values=df_p6["total"],
+            hole=0.55,
+            marker=dict(colors=colors, line=dict(color="#ffffff", width=2)),
+            textinfo="label+percent",
+            textposition="outside",
+            textfont=dict(size=12, color="#4a4b5a"),
+            hovertemplate=(
+                "<b>%{label}</b><br>"
+                "Produtos: %{value:,.0f}<br>"
+                "Participação: %{percent}<br>"
+                "<extra></extra>"
+            ),
+            pull=[0.03 if i == 0 else 0 for i in range(len(df_p6))],
+        )])
+
+        total_prod = int(df_p6["total"].sum())
+        fig_p6.add_annotation(
+            text=f"<b>{fmt_int(total_prod)}</b><br><span style='font-size:10px'>produtos</span>",
+            x=0.5, y=0.5,
+            font=dict(size=14, color="#1a1b21"),
+            showarrow=False,
+            align="center",
         )
-        fig_p6.update_traces(
-            textinfo="percent+label",
-            hole=0.48,
-            textfont_size=13,
-        )
+
         fig_p6.update_layout(
             **GRAPH_LAYOUT,
-            showlegend=False,
-            margin=dict(t=10, b=10, l=10, r=10),
-            height=300,
+            showlegend=True,
+            legend=dict(
+                orientation="v",
+                yanchor="middle",
+                y=0.5,
+                xanchor="left",
+                x=1.02,
+                font=dict(size=11, color="#4a4b5a"),
+                bgcolor="rgba(0,0,0,0)",
+                borderwidth=0,
+            ),
+            margin=dict(t=10, b=10, l=10, r=80),
+            height=280,
         )
         st.plotly_chart(fig_p6, use_container_width=True)
 
@@ -315,7 +339,7 @@ if not check_empty(df_p6):
         st.markdown("<br>", unsafe_allow_html=True)
         for _, r in df_p6.iterrows():
             lbl    = label_map.get(r["condition"], r["condition"])
-            accent = color_map.get(r["condition"], BLUE)
+            accent = color_map.get(r["condition"], "#9a9aaa")
             st.markdown(
                 f"""
                 <div style="
