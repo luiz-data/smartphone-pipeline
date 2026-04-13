@@ -160,15 +160,38 @@ if db_ok:
         row = df_kpi.iloc[0]
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1:
-            kpi_card("package", "Produtos", fmt_int(row["total_produtos"]), warm=True)
+            kpi_card(
+                "package", "Produtos", fmt_int(row["total_produtos"]),
+                back_insight="Total de listagens ativas capturadas no período selecionado.",
+                back_comps=[{"label": "Fonte", "value": "Amazon BR"}, {"label": "Cache", "value": "5 min"}],
+            )
         with c2:
-            kpi_card("dollar", "Preço Médio", fmt_brl(row["preco_medio"]), warm=True)
+            kpi_card(
+                "dollar", "Preço Médio", fmt_brl(row["preco_medio"]),
+                back_insight="Média ponderada de todos os produtos no período. Acesse Visão Geral para ver a distribuição completa.",
+                back_comps=[{"label": "Menor preço", "value": fmt_brl(row["preco_min"])}],
+            )
         with c3:
-            kpi_card("tag", "Menor Preço", fmt_brl(row["preco_min"]), icon_color="green")
+            kpi_card(
+                "tag", "Menor Preço", fmt_brl(row["preco_min"]),
+                icon_color="green",
+                back_insight="Produto mais barato no período. Veja a distribuição por faixa na página Visão Geral.",
+                back_comps=[{"label": "Marcas", "value": fmt_int(row["total_marcas"])}],
+            )
         with c4:
-            kpi_card("award", "Marcas", fmt_int(row["total_marcas"]), icon_color="purple")
+            kpi_card(
+                "award", "Marcas", fmt_int(row["total_marcas"]),
+                icon_color="purple",
+                back_insight="Fabricantes com pelo menos 1 produto no período. Veja ranking completo em Marcas & Competitividade.",
+                back_comps=[{"label": "Frete grátis", "value": fmt_pct(row["pct_frete_gratis"])}],
+            )
         with c5:
-            kpi_card("truck", "Frete Grátis", fmt_pct(row["pct_frete_gratis"]), icon_color="blue")
+            kpi_card(
+                "truck", "Frete Grátis", fmt_pct(row["pct_frete_gratis"]),
+                icon_color="blue",
+                back_insight="Proporção de produtos com frete incluso. Produtos premium usam frete grátis como estratégia de conversão.",
+                back_comps=[{"label": "Preço médio", "value": fmt_brl(row["preco_medio"])}],
+            )
     else:
         st.info("Nenhum dado disponível para os filtros selecionados.")
 

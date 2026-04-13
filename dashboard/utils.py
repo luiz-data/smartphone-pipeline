@@ -55,16 +55,10 @@ GRAPH_LAYOUT = dict(
     plot_bgcolor="rgba(22,22,42,0.6)",
     font=dict(family="Inter, Segoe UI, sans-serif", color="#888899", size=11),
     colorway=[GOLD, GOLD_LIGHT, BLUE, GREEN, RED, PURPLE, AMBER, TEAL, "#34d399", "#60a5fa"],
-    margin=dict(t=16, b=8, l=8, r=8),
     hoverlabel=dict(
         bgcolor="#16162a",
         bordercolor=BORDER_GOLD,
         font=dict(color=TEXT_PRI, size=12),
-    ),
-    legend=dict(
-        bgcolor="rgba(0,0,0,0)",
-        bordercolor=BORDER,
-        font=dict(color=TEXT_SEC),
     ),
 )
 
@@ -234,95 +228,165 @@ def _inject_css() -> None:
             border-right: 1px solid var(--border-subtle);
         }
 
-        /* ── KPI Cards ───────────────────────────────────── */
-        .kpi-card {
+        /* ── KPI Flip Cards ──────────────────────────────── */
+        .flip-wrapper {
+            perspective: 1000px;
+            height: 148px;
+            cursor: pointer;
+        }
+        .flip-inner {
             position: relative;
-            background: var(--bg-card);
+            width: 100%;
+            height: 100%;
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-wrapper:hover .flip-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-front,
+        .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-sizing: border-box;
             border: 1px solid var(--border-subtle);
-            border-top: 2px solid var(--border-gold);
-            border-radius: var(--radius-card);
-            padding: 20px 18px 16px;
-            min-height: 130px;
+            border-top: 2px solid var(--accent-gold);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             box-shadow: var(--shadow-card);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
             overflow: hidden;
         }
-        .kpi-card::before {
+        .flip-front::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 60px;
-            background: linear-gradient(180deg, var(--accent-gold-muted) 0%, transparent 100%);
-            pointer-events: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
         }
-        .kpi-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-        }
-        .kpi-card.warm {
-            border-top-color: var(--accent-gold);
-        }
-        .kpi-card.warm::before {
-            background: linear-gradient(180deg, rgba(201,168,76,0.18) 0%, transparent 100%);
-        }
-        .kpi-header {
+        .flip-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, rgba(42,36,20,0.97) 0%, rgba(28,24,12,0.95) 100%);
+            border-top-color: var(--accent-gold-lt);
             display: flex;
-            align-items: flex-start;
+            flex-direction: column;
             justify-content: space-between;
-            margin-bottom: 12px;
         }
-        .kpi-label {
-            font-size: 0.68rem;
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .card-label {
+            font-size: 0.62rem;
             font-weight: 600;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
             color: var(--text-secondary);
         }
-        .kpi-icon {
-            width: 32px;
-            height: 32px;
+        .card-icon-box {
+            width: 30px; height: 30px;
+            background: var(--accent-gold-muted);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--accent-gold-muted);
-            border-radius: 8px;
-            color: var(--accent-gold);
-            flex-shrink: 0;
         }
-        .kpi-icon.blue  { background: rgba(74,122,255,0.12); color: var(--accent-blue); }
-        .kpi-icon.green { background: rgba(0,200,150,0.12);  color: var(--accent-green); }
-        .kpi-icon.red   { background: rgba(255,83,112,0.12); color: var(--accent-red); }
-        .kpi-icon.purple{ background: rgba(167,139,250,0.12);color: #a78bfa; }
-        .kpi-value {
-            font-size: 1.65rem;
-            font-weight: 700;
+        .card-icon-box svg {
+            width: 14px; height: 14px;
+            stroke: var(--accent-gold);
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .card-icon-box.blue  { background: rgba(74,122,255,0.12); }
+        .card-icon-box.blue  svg { stroke: var(--accent-blue); }
+        .card-icon-box.green { background: rgba(0,200,150,0.12); }
+        .card-icon-box.green svg { stroke: var(--accent-green); }
+        .card-icon-box.red   { background: rgba(255,83,112,0.12); }
+        .card-icon-box.red   svg { stroke: var(--accent-red); }
+        .card-icon-box.purple{ background: rgba(167,139,250,0.12); }
+        .card-icon-box.purple svg { stroke: #a78bfa; }
+        .card-value {
+            font-size: 1.6rem;
+            font-weight: 800;
             color: var(--text-primary);
             line-height: 1.1;
             letter-spacing: -0.02em;
             margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
         }
-        .kpi-footer {
+        .card-bottom {
             display: flex;
             align-items: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
-        .kpi-delta {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
+        .card-delta {
             font-size: 0.72rem;
-            font-weight: 600;
-            padding: 2px 7px;
-            border-radius: 20px;
+            font-weight: 700;
         }
-        .kpi-delta.positive { background: rgba(0,200,150,0.12); color: var(--accent-green); }
-        .kpi-delta.negative { background: rgba(255,83,112,0.12); color: var(--accent-red); }
-        .kpi-delta.neutral  { background: rgba(201,168,76,0.12); color: var(--accent-gold); }
-        .kpi-sub {
-            font-size: 0.7rem;
+        .card-delta.positive { color: var(--accent-green); }
+        .card-delta.negative { color: var(--accent-red); }
+        .card-delta.neutral  { color: var(--text-secondary); }
+        .card-sub {
+            font-size: 0.68rem;
             color: var(--text-muted);
+        }
+        /* ── Flip Back ───────────────────────────────────── */
+        .back-title {
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2px;
+        }
+        .back-main {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-gold-lt);
+            letter-spacing: -0.02em;
+        }
+        .back-divider {
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+            margin: 6px 0;
+        }
+        .back-insight {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            flex: 1;
+        }
+        .back-comparisons {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .back-comp-item {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .comp-label {
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        .comp-value {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-gold-lt);
         }
 
         /* ── Section Header ──────────────────────────────── */
@@ -452,47 +516,78 @@ def _inject_css() -> None:
     )
 
 
-# ── KPI Card ───────────────────────────────────────────────────────────────
+# ── KPI Flip Card ─────────────────────────────────────────────────────────
 
 def kpi_card(
     icon_key: str,
     label: str,
     value: str,
     delta: str = "",
-    delta_type: str = "neutral",   # "positive" | "negative" | "neutral"
+    delta_type: str = "neutral",      # "positive" | "negative" | "neutral"
     sub: str = "",
+    icon_color: str = "",             # "" = gold, "blue", "green", "red", "purple"
+    back_insight: str = "",           # texto assertivo no verso
+    back_comps: list = None,          # [{"label": str, "value": str}, ...]
+    # Legacy compat (ignored)
     warm: bool = False,
-    icon_color: str = "",          # "" = gold (default), "blue", "green", "red", "purple"
-    # Legacy compat params (ignored):
     delta_color: str = "",
     bg: str = "",
     accent: str = "",
 ) -> None:
-    """Card KPI glassmorphism estilo dashboard financeiro."""
+    """Card KPI com flip 3D — frente: valor, verso: insight + comparações."""
     svg_icon = SVG.get(icon_key, SVG["bar_chart"])
-    warm_cls  = " warm" if warm else ""
-    icon_cls  = f" {icon_color}" if icon_color else ""
+    icon_cls = f" {icon_color}" if icon_color else ""
 
-    delta_html = ""
+    # Delta front
     if delta:
-        arr = SVG["arrow_up"] if delta_type == "positive" else (SVG["arrow_down"] if delta_type == "negative" else "")
-        delta_html = (
-            f'<span class="kpi-delta {delta_type}">'
-            f'{arr}{delta}'
-            f'</span>'
-        )
+        arr = "↑ " if delta_type == "positive" else ("↓ " if delta_type == "negative" else "")
+        delta_html = f'<span class="card-delta {delta_type}">{arr}{delta}</span>'
+    else:
+        delta_html = ""
 
-    sub_html = f'<span class="kpi-sub">{sub}</span>' if sub else ""
+    sub_html = f'<span class="card-sub">{sub}</span>' if sub else ""
+
+    # Comparações verso
+    comps_html = ""
+    if back_comps:
+        items = "".join(
+            f'<div class="back-comp-item">'
+            f'<span class="comp-label">{c["label"]}</span>'
+            f'<span class="comp-value">{c["value"]}</span>'
+            f'</div>'
+            for c in back_comps
+        )
+        comps_html = f'<div class="back-comparisons">{items}</div>'
+
+    back_content = (
+        f'<div class="back-title">{label}</div>'
+        f'<div class="back-main">{value}</div>'
+        f'<div class="back-divider"></div>'
+        f'<div class="back-insight">{back_insight}</div>'
+        f'{comps_html}'
+    ) if back_insight else (
+        f'<div class="back-title">{label}</div>'
+        f'<div class="back-main">{value}</div>'
+        f'<div class="back-divider"></div>'
+        f'{comps_html}'
+    )
 
     st.markdown(
         f"""
-        <div class="kpi-card{warm_cls}">
-          <div class="kpi-header">
-            <span class="kpi-label">{label}</span>
-            <div class="kpi-icon{icon_cls}">{svg_icon}</div>
+        <div class="flip-wrapper">
+          <div class="flip-inner">
+            <div class="flip-front">
+              <div class="card-top">
+                <span class="card-label">{label}</span>
+                <div class="card-icon-box{icon_cls}">{svg_icon}</div>
+              </div>
+              <div class="card-value">{value}</div>
+              <div class="card-bottom">{delta_html}{sub_html}</div>
+            </div>
+            <div class="flip-back">
+              {back_content}
+            </div>
           </div>
-          <div class="kpi-value">{value}</div>
-          <div class="kpi-footer">{delta_html}{sub_html}</div>
         </div>
         """,
         unsafe_allow_html=True,

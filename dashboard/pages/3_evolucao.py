@@ -193,24 +193,58 @@ if not check_empty(df_p5, "Sem dados de evolução temporal para o período sele
         color_ins,
     )
 
+    min_price_val = float(df_p5["min_price"].min())
+    max_price_val = float(df_p5["max_price"].max())
+    amplitude     = max_price_val - min_price_val
+
     st.markdown("<br>", unsafe_allow_html=True)
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        kpi_card("calendar", "Dias Monitorados", fmt_int(len(df_p5)), icon_color="blue")
+        kpi_card(
+            "calendar", "Dias Monitorados", fmt_int(len(df_p5)),
+            icon_color="blue",
+            back_insight="Cada ponto representa uma coleta de preços. Mais dias = tendências mais confiáveis para identificar sazonalidade e janelas de promoção.",
+            back_comps=[
+                {"label": "Período", "value": f"Últimos {filters['period_days']}d"},
+                {"label": "Registros/dia", "value": fmt_int(int(df_p5['total_observations'].mean())) if 'total_observations' in df_p5.columns else "—"},
+            ],
+        )
     with k2:
         avg_chg = df_p5["avg_price_pct_change"].dropna()
         chg_val = float(avg_chg.mean()) if not avg_chg.empty else 0
+        chg_direction = "positive" if chg_val < 0 else ("negative" if chg_val > 0 else "neutral")
         kpi_card(
             "trending_down" if chg_val < 0 else "trending_up",
             "Variação Média Diária",
             fmt_pct(chg_val) if not avg_chg.empty else "—",
-            delta_type="positive" if chg_val < 0 else "negative",
+            delta_type=chg_direction,
             icon_color="green" if chg_val < 0 else "red",
+            back_insight="Variação média entre dias consecutivos. Valor próximo de zero indica estabilidade de preços — favorável para planejar a compra com antecedência.",
+            back_comps=[
+                {"label": "1ª observação", "value": fmt_brl(first_price)},
+                {"label": "Última", "value": fmt_brl(last_price)},
+            ],
         )
     with k3:
-        kpi_card("trending_down", "Menor Preço Registrado", fmt_brl(float(df_p5["min_price"].min())), icon_color="green")
+        kpi_card(
+            "trending_down", "Menor Preço", fmt_brl(min_price_val),
+            icon_color="green",
+            back_insight="Menor preço observado em qualquer dia do período. Útil para identificar janelas de compra ideais e picos de promoção relâmpago.",
+            back_comps=[
+                {"label": "Maior preço", "value": fmt_brl(max_price_val)},
+                {"label": "Amplitude", "value": fmt_brl(amplitude)},
+            ],
+        )
     with k4:
-        kpi_card("trending_up", "Maior Preço Registrado", fmt_brl(float(df_p5["max_price"].max())), icon_color="red")
+        kpi_card(
+            "trending_up", "Maior Preço", fmt_brl(max_price_val),
+            icon_color="red",
+            back_insight="Maior preço observado no período. A diferença entre máximo e mínimo revela a volatilidade do mercado — quanto maior, mais oportunidade para comprar no vale.",
+            back_comps=[
+                {"label": "Menor preço", "value": fmt_brl(min_price_val)},
+                {"label": "Variação total", "value": fmt_pct(abs(variation))},
+            ],
+        )
 
 
 # ══════════════════════════════════════════════════════════════════════════

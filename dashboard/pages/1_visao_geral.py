@@ -85,30 +85,91 @@ df_p1 = run_query(sql_p1)
 
 if not check_empty(df_p1):
     row = df_p1.iloc[0]
+    free_count = round(float(row["total"]) * float(row["pct_free_shipping"]) / 100) if row["pct_free_shipping"] else 0
+    pct_diff   = ((float(row["avg_price"]) - float(row["median_price"])) / float(row["median_price"]) * 100) if row["median_price"] else 0
+
     cols = st.columns(5)
     with cols[0]:
-        kpi_card("package", "Total Produtos", fmt_int(row["total"]), warm=True)
+        kpi_card(
+            "package", "Total Produtos", fmt_int(row["total"]),
+            back_insight="Amazon BR lista milhares de smartphones. Nossa coleta captura os mais relevantes por volume de avaliações e relevância de busca.",
+            back_comps=[
+                {"label": "Com frete grátis", "value": fmt_int(free_count)},
+                {"label": "Desconto médio", "value": fmt_pct(row["avg_discount"])},
+            ],
+        )
     with cols[1]:
-        kpi_card("dollar", "Preço Médio", fmt_brl(row["avg_price"]), warm=True)
+        kpi_card(
+            "dollar", "Preço Médio", fmt_brl(row["avg_price"]),
+            back_insight=f"Média influenciada pelo segmento premium. Mediana de {fmt_brl(row['median_price'])} representa melhor o mercado real — 50% dos produtos custam menos.",
+            back_comps=[
+                {"label": "Mediana", "value": fmt_brl(row["median_price"])},
+                {"label": "P25", "value": fmt_brl(row["p25_price"])},
+            ],
+        )
     with cols[2]:
-        kpi_card("tag", "Preço Mínimo", fmt_brl(row["min_price"]), icon_color="green")
+        kpi_card(
+            "tag", "Preço Mínimo", fmt_brl(row["min_price"]),
+            icon_color="green",
+            back_insight="Produto mais barato da categoria. Faixas até R$999 dominam em volume, atraindo consumidores de entrada e usados recondicionados.",
+            back_comps=[
+                {"label": "P25", "value": fmt_brl(row["p25_price"])},
+                {"label": "Mediana", "value": fmt_brl(row["median_price"])},
+            ],
+        )
     with cols[3]:
-        kpi_card("trending_up", "Preço Máximo", fmt_brl(row["max_price"]), icon_color="red")
+        kpi_card(
+            "trending_up", "Preço Máximo", fmt_brl(row["max_price"]),
+            icon_color="red",
+            back_insight="Extremidade premium do mercado. O segmento acima de R$5.000 é dominado por marcas como Apple — muito acima da mediana geral.",
+            back_comps=[
+                {"label": "P75", "value": fmt_brl(row["p75_price"])},
+                {"label": "Mediana", "value": fmt_brl(row["median_price"])},
+            ],
+        )
     with cols[4]:
-        kpi_card("layers", "Mediana", fmt_brl(row["median_price"]), icon_color="blue")
+        kpi_card(
+            "layers", "Mediana", fmt_brl(row["median_price"]),
+            icon_color="blue",
+            back_insight=f"Valor que divide o catálogo ao meio — mais representativo que a média. Indica que o mercado intermediário é dominante. Diferença à média: +{pct_diff:.1f}%.",
+            back_comps=[
+                {"label": "Média", "value": fmt_brl(row["avg_price"])},
+                {"label": "P75", "value": fmt_brl(row["p75_price"])},
+            ],
+        )
 
     st.markdown("<br>", unsafe_allow_html=True)
     cols2 = st.columns(3)
     with cols2[0]:
-        kpi_card("truck", "Frete Grátis", fmt_pct(row["pct_free_shipping"]), icon_color="green")
-    with cols2[1]:
         kpi_card(
-            "star", "Avaliação Média",
-            f"{float(row['avg_rating']):.2f}".replace(".", ",") if row["avg_rating"] else "—",
-            icon_color="",
+            "truck", "Frete Grátis", fmt_pct(row["pct_free_shipping"]),
+            icon_color="green",
+            back_insight="Produtos com frete grátis geralmente têm ticket mais alto. Frete incluso é estratégia frequente no segmento premium para reduzir barreira de compra.",
+            back_comps=[
+                {"label": "Com frete", "value": fmt_int(free_count)},
+                {"label": "Desconto médio", "value": fmt_pct(row["avg_discount"])},
+            ],
+        )
+    with cols2[1]:
+        rating_str = f"{float(row['avg_rating']):.2f}".replace(".", ",") if row["avg_rating"] else "—"
+        kpi_card(
+            "star", "Avaliação Média", rating_str,
+            back_insight="Rating consistente indica mercado maduro. Alta concentração de avaliações 4+ sugere produtos de qualidade razoável — compradores tendem a avaliar apenas quando satisfeitos.",
+            back_comps=[
+                {"label": "Desconto médio", "value": fmt_pct(row["avg_discount"])},
+                {"label": "Frete grátis", "value": fmt_pct(row["pct_free_shipping"])},
+            ],
         )
     with cols2[2]:
-        kpi_card("percent", "Desconto Médio", fmt_pct(row["avg_discount"]), icon_color="purple")
+        kpi_card(
+            "percent", "Desconto Médio", fmt_pct(row["avg_discount"]),
+            icon_color="purple",
+            back_insight="Desconto médio modesto. Correlação fraca entre desconto e avaliações — mais desconto não gera necessariamente mais volume de vendas.",
+            back_comps=[
+                {"label": "Preço médio", "value": fmt_brl(row["avg_price"])},
+                {"label": "Mediana", "value": fmt_brl(row["median_price"])},
+            ],
+        )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
