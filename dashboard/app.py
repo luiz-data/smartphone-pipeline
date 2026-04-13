@@ -410,21 +410,43 @@ with col_left:
         )
         fig_p2.update_layout(
             **GRAPH_LAYOUT,
-            bargap=0.4,
-            bargroupgap=0.08,
-            height=300,
-            margin=dict(t=10, b=0, l=0, r=0),
+            title=dict(
+                text="Proporção com frete grátis por condição",
+                font=dict(size=11, color="#4a4b5a"),
+                x=0,
+                pad=dict(l=0, t=0),
+            ),
+            bargap=0.5,
+            bargroupgap=0.15,
+            height=320,
+            margin=dict(t=36, b=0, l=0, r=0),
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=1.02,
+                y=1.05,
                 xanchor="right",
                 x=1,
-                font=dict(size=10),
+                font=dict(size=10, color="#4a4b5a"),
+                bgcolor="rgba(0,0,0,0)",
+                borderwidth=0,
+            ),
+            yaxis=dict(
+                title="Proporção (%)",
+                title_font=dict(size=10, color="#9a9aaa"),
+                ticksuffix="%",
+                tickfont=dict(size=9, color="#9a9aaa"),
+                gridcolor="rgba(0,0,0,0.05)",
+                linecolor="rgba(0,0,0,0.08)",
+                showticklabels=True,
+            ),
+            xaxis=dict(
+                title="",
+                tickfont=dict(size=10, color="#4a4b5a"),
+                linecolor="rgba(0,0,0,0.08)",
             ),
         )
         fig_p2.update_xaxes(**AXIS_STYLE)
-        fig_p2.update_yaxes(**AXIS_STYLE, showticklabels=False)
+        fig_p2.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p2, use_container_width=True)
 
 with col_right:
@@ -466,14 +488,32 @@ with col_right:
             **GRAPH_LAYOUT,
             template=PLOTLY_TEMPLATE,
             showlegend=False,
-            bargap=0.5,
-            height=300,
-            yaxis_title="",
-            xaxis_title="",
-            margin=dict(t=10, b=0, l=0, r=0),
+            title=dict(
+                text="Preço médio: frete grátis vs pago",
+                font=dict(size=11, color="#4a4b5a"),
+                x=0,
+                pad=dict(l=0, t=0),
+            ),
+            bargap=0.55,
+            height=320,
+            margin=dict(t=36, b=0, l=0, r=0),
+            yaxis=dict(
+                title="Preço médio (R$)",
+                title_font=dict(size=10, color="#9a9aaa"),
+                tickprefix="R$ ",
+                tickfont=dict(size=9, color="#9a9aaa"),
+                gridcolor="rgba(0,0,0,0.05)",
+                linecolor="rgba(0,0,0,0.08)",
+                showticklabels=True,
+            ),
+            xaxis=dict(
+                title="",
+                tickfont=dict(size=11, color="#4a4b5a"),
+                linecolor="rgba(0,0,0,0.08)",
+            ),
         )
         fig_p8.update_xaxes(**AXIS_STYLE)
-        fig_p8.update_yaxes(**AXIS_STYLE, showticklabels=False)
+        fig_p8.update_yaxes(**AXIS_STYLE)
         st.plotly_chart(fig_p8, use_container_width=True)
 
         rows_dict = {bool(r["free_shipping"]): r for _, r in df_p8.iterrows()}
