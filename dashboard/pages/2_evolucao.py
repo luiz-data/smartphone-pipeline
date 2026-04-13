@@ -42,9 +42,9 @@ from utils import (
 )
 
 st.set_page_config(
-    page_title="Evolução de Preços — Smartphones BR",
-    page_icon="📈",
+    page_title="Evolução",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ── Sidebar (injeta CSS global) ────────────────────────────────────────────

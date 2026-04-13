@@ -45,9 +45,9 @@ from utils import (
 )
 
 st.set_page_config(
-    page_title="Marcas & Competitividade — Smartphones BR",
-    page_icon="🏆",
+    page_title="Vendedores",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ── Sidebar (injeta CSS global) ────────────────────────────────────────────
